@@ -8,9 +8,12 @@ export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: BlogModelType) {}
 
   async getBlogs(): Promise<BlogDocument[]> {
-    return this.blogModel.find().exec();
+    return this.blogModel.find().lean();
   }
   async getBlogById(id: Types.ObjectId): Promise<BlogDocument | null> {
     return this.blogModel.findById(id);
+  }
+  async save(blog: BlogDocument) {
+    return await blog.save();
   }
 }

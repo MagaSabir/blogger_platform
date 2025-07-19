@@ -11,6 +11,6 @@ import { Blog, BlogSchema } from './blog/domain/blog.entity';
   ],
   controllers: [BlogsController],
   providers: [BlogsService, BlogsRepository],
-  exports: [BlogsService],
+  // exports: [BlogsService],
 })
 export class BloggersPlatformModule {}

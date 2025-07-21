@@ -4,20 +4,22 @@ import { BlogDocument } from '../domain/blog.entity';
 import { Types } from 'mongoose';
 import { CreatedBlogDto } from '../dto/created-blog.dto';
 import { BlogViewDto } from './blog.view';
+import { QueryBlogRepository } from '../infrastructure/query-repository/query.blog.repository';
 
 @Controller('blogs')
 export class BlogsController {
-  constructor(private blogService: BlogsService) {}
+  constructor(
+    private blogService: BlogsService,
+    private blogQueryRepo: QueryBlogRepository,
+  ) {}
   @Get()
-  async getBlogs(): Promise<BlogDocument[]> {
-    return await this.blogService.getAll();
+  async getBlogs() {
+    return await this.blogQueryRepo.getAllBlogs();
   }
 
   @Get(':id')
-  async getBlogById(
-    @Param('id') id: Types.ObjectId,
-  ): Promise<BlogDocument | null> {
-    return await this.blogService.getBlogById(id);
+  async getBlogById(@Param('id') id: Types.ObjectId) {
+    return await this.blogQueryRepo.getBlog(id);
   }
 
   @Post()

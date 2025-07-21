@@ -8,13 +8,14 @@ export class QueryBlogRepository {
   constructor(@InjectModel(Blog.name) private blogModel: BlogModelType) {}
 
   async getAllBlogs() {
-    const blogs = await this.blogModel.find().lean();
-    const blog = blogs.map(BlogViewDto.mapToView);
-    return blog;
+    const blogs = await this.blogModel.find({ deletedAt: null }).lean();
+    return blogs;
   }
 
   async getBlog(id) {
-    const blog = await this.blogModel.findById(id).lean();
+    const blog = await this.blogModel
+      .findOne({ _id: id, deletedAt: null })
+      .exec();
     if (!blog) {
       throw new NotFoundException('Not found');
     }

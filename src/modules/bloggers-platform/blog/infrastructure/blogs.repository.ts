@@ -10,7 +10,7 @@ export class BlogsRepository {
   async getBlogs(): Promise<BlogDocument[]> {
     return this.blogModel.find().lean();
   }
-  async getBlogById(id: Types.ObjectId): Promise<BlogDocument | null> {
+  async findBlogById(id: Types.ObjectId): Promise<BlogDocument | null> {
     return this.blogModel.findById(id);
   }
   async save(blog: BlogDocument) {

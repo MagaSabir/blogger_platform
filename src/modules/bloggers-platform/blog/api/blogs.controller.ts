@@ -1,8 +1,15 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
-import { BlogDocument } from '../domain/blog.entity';
 import { Types } from 'mongoose';
-import { CreatedBlogDto } from '../dto/created-blog.dto';
+import { CreatedBlogDto, UpdateBlogDto } from '../dto/created-blog.dto';
 import { BlogViewDto } from './blog.view';
 import { QueryBlogRepository } from '../infrastructure/query-repository/query.blog.repository';
 
@@ -24,7 +31,17 @@ export class BlogsController {
 
   @Post()
   async createBlog(@Body() body: CreatedBlogDto) {
-    const blog: BlogDocument = await this.blogService.createBlog(body);
+    const blog = await this.blogService.createBlog(body);
     return BlogViewDto.mapToView(blog);
+  }
+
+  @Put(':id')
+  async updateBlog(@Param('id') id: string, @Body() body: UpdateBlogDto) {
+    return await this.blogService.updateBlog(id, body);
+  }
+
+  @Delete(':id')
+  async deleteBlog(@Param('id') id: Types.ObjectId) {
+    return await this.blogService.deleteBlog(id);
   }
 }

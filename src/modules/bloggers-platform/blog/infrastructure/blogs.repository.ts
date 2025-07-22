@@ -7,13 +7,10 @@ import { Types } from 'mongoose';
 export class BlogsRepository {
   constructor(@InjectModel(Blog.name) private blogModel: BlogModelType) {}
 
-  async getBlogs(): Promise<BlogDocument[]> {
-    return this.blogModel.find().lean();
-  }
   async findBlogById(id: Types.ObjectId): Promise<BlogDocument | null> {
     return this.blogModel.findById(id);
   }
-  async save(blog: BlogDocument) {
+  async save(blog: BlogDocument): Promise<BlogDocument> {
     return await blog.save();
   }
 }

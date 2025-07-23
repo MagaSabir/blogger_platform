@@ -12,22 +12,21 @@ export class BlogsService {
     @InjectModel(Blog.name) private BlogModel: BlogModelType,
   ) {}
 
-  async createBlog(dto: CreatedBlogDto): Promise<BlogDocument> {
+  async createBlog(dto: CreatedBlogDto): Promise<Types.ObjectId> {
     const blog: BlogDocument = this.BlogModel.createBlog(dto);
     return this.blogRepo.save(blog);
   }
 
   async updateBlog(id: Types.ObjectId, dto: UpdateBlogDto) {
     const blog: BlogDocument | null = await this.blogRepo.findBlogById(id);
-    if (!blog) return new NotFoundException('Not Found');
+    if (!blog) throw new NotFoundException('Not Found');
     blog.updateBlog(dto);
     await this.blogRepo.save(blog);
-    return true;
   }
 
   async deleteBlog(id: Types.ObjectId) {
     const blog: BlogDocument | null = await this.blogRepo.findBlogById(id);
-    if (!blog) return new NotFoundException('NotFound');
+    if (!blog) throw new NotFoundException('Not Found');
 
     blog.deleteBlog();
 

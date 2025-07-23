@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Put,
@@ -14,7 +16,6 @@ import { CreatedBlogDto, UpdateBlogDto } from '../dto/created-blog.dto';
 import { BlogViewDto } from './blog.view-dto';
 import { QueryBlogRepository } from '../infrastructure/query-repository/query.blog.repository';
 import { BlogsQueryParams } from './input-validation-dto/blogs-query-params';
-import { BlogDocument } from '../domain/blog.entity';
 
 @Controller('blogs')
 export class BlogsController {
@@ -34,20 +35,22 @@ export class BlogsController {
 
   @Post()
   async createBlog(@Body() body: CreatedBlogDto): Promise<BlogViewDto> {
-    const blog: BlogDocument = await this.blogService.createBlog(body);
-    return BlogViewDto.mapToView(blog);
+    const id: Types.ObjectId = await this.blogService.createBlog(body);
+    return this.blogQueryRepo.getBlog(id);
   }
 
   @Put(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async updateBlog(
     @Param('id') id: Types.ObjectId,
     @Body() body: UpdateBlogDto,
   ) {
-    return await this.blogService.updateBlog(id, body);
+    await this.blogService.updateBlog(id, body);
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id') id: Types.ObjectId) {
-    return await this.blogService.deleteBlog(id);
+    await this.blogService.deleteBlog(id);
   }
 }

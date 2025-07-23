@@ -34,6 +34,7 @@ export class QueryBlogRepository {
     return {
       pageCount: Math.ceil(totalCount / limit),
       page: query.pageNumber,
+      pageSize: query.pageSize,
       totalCount,
       items,
     };

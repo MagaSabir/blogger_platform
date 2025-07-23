@@ -27,13 +27,13 @@ export class Blog {
     return blog as BlogDocument;
   }
 
-  updateBlog(dto: UpdateBlogDto) {
+  updateBlog(dto: UpdateBlogDto): void {
     this.name = dto.name;
     this.description = dto.description;
     this.websiteUrl = dto.websiteUrl;
   }
 
-  deleteBlog() {
+  deleteBlog(): void {
     if (this.deletedAt !== null) {
       throw new Error('Entity already deleted');
     }

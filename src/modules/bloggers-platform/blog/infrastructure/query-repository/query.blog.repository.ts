@@ -3,13 +3,16 @@ import { Blog, BlogDocument, BlogModelType } from '../../domain/blog.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { BlogViewDto } from '../../api/blog.view-dto';
 import { BlogsQueryParams } from '../../api/input-validation-dto/blogs-query-params';
-import { FilterQuery, Types } from 'mongoose';
+import { FilterQuery } from 'mongoose';
+import { BasePaginatedResponse } from '../../../../../core/base-paginated-response';
 
 @Injectable()
 export class QueryBlogRepository {
   constructor(@InjectModel(Blog.name) private blogModel: BlogModelType) {}
 
-  async getAllBlogs(query: BlogsQueryParams) {
+  async getAllBlogs(
+    query: BlogsQueryParams,
+  ): Promise<BasePaginatedResponse<BlogViewDto>> {
     const filter: FilterQuery<Blog> = { deletedAt: null };
     if (query.searchNameTerm) {
       filter.name = {
@@ -40,7 +43,7 @@ export class QueryBlogRepository {
     };
   }
 
-  async getBlog(id: Types.ObjectId): Promise<BlogViewDto> {
+  async getBlog(id: string): Promise<BlogViewDto> {
     const blog: BlogDocument | null = await this.blogModel
       .findOne({ _id: id, deletedAt: null })
       .exec();

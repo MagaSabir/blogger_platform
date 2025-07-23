@@ -21,7 +21,7 @@ export class PostViewDto {
     dto.title = post.title;
     dto.shortDescription = post.shortDescription;
     dto.content = post.content;
-    dto.blogId = post.blogId.toString();
+    dto.blogId = post.blogId;
     dto.blogName = blogName;
     dto.createdAt = post.createdAt;
     dto.extendedLikesInfo = {

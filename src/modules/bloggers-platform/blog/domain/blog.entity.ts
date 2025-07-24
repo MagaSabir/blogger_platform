@@ -13,7 +13,7 @@ export class Blog {
   @Prop({ type: String, required: true, minlength: 3, maxlength: 100 })
   websiteUrl: string;
 
-  @Prop({ type: Date, required: true, default: new Date() })
+  @Prop({ type: Date, required: true, default: Date.now })
   createdAt: Date;
 
   @Prop({ type: Date, default: null })

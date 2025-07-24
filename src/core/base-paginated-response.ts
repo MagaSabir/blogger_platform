@@ -1,5 +1,5 @@
 export class BasePaginatedResponse<T> {
-  pageCount: number;
+  pagesCount: number;
   page: number;
   pageSize: number;
   totalCount: number;

@@ -23,19 +23,20 @@ export class QueryBlogRepository {
     const skip: number = query.calculateSkip();
     const limit: number = query.pageSize;
     const sort = {
-      [query.sortBy ?? 'createdAt']: query.sortDirection ?? 'desc',
+      [query.sortBy]: query.sortDirection,
     };
     const [blogs, totalCount] = await Promise.all([
       this.blogModel.find(filter).sort(sort).skip(skip).limit(limit),
-      this.blogModel.countDocuments(),
+      this.blogModel.countDocuments(filter),
     ]);
 
     const items: BlogViewDto[] = blogs.map(
       (blog: BlogDocument): BlogViewDto => BlogViewDto.mapToView(blog),
     );
+    console.log(query.pageNumber);
 
     return {
-      pageCount: Math.ceil(totalCount / limit),
+      pagesCount: Math.ceil(totalCount / limit),
       page: query.pageNumber,
       pageSize: query.pageSize,
       totalCount,
@@ -51,5 +52,9 @@ export class QueryBlogRepository {
       throw new NotFoundException('Not found');
     }
     return BlogViewDto.mapToView(blog);
+  }
+
+  async getBlogsByIds(ids: Array<string>) {
+    return this.blogModel.find({ _id: { $in: ids }, deletedAt: null }).lean();
   }
 }

@@ -19,11 +19,14 @@ import { QueryPostRepository } from '../../post/infrastructure/query-repository/
 import { PostsQueryParams } from '../../post/api/input-validation-dto/PostsQueryParams';
 import { BasePaginatedResponse } from '../../../../core/base-paginated-response';
 import { PostViewDto } from '../../post/api/post.view-dto';
+import { PostService } from '../../post/application/post.service';
+import { CreatedPostDto } from '../../post/dto/created-post.dto';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
     private blogService: BlogsService,
+    private postService: PostService,
     private blogQueryRepo: QueryBlogRepository,
     private postQueryRepo: QueryPostRepository,
   ) {}
@@ -66,5 +69,14 @@ export class BlogsController {
     @Query() query: PostsQueryParams,
   ): Promise<BasePaginatedResponse<PostViewDto>> {
     return this.postQueryRepo.getAllPostsByBlogId(id, query);
+  }
+
+  @Post(':id/posts')
+  async createPostByBlogId(
+    @Body() dto: Omit<CreatedPostDto, 'blogId'>,
+    @Param('id') id: string,
+  ) {
+    const postId: string = await this.postService.createdPostByBlogId(dto, id);
+    return this.postQueryRepo.getPostById(postId);
   }
 }

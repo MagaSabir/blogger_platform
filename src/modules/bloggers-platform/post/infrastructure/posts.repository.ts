@@ -1,6 +1,5 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModelType } from '../domain/post.entity';
-import { ObjectId } from 'mongoose';
 
 export class PostsRepository {
   constructor(@InjectModel(Post.name) private postModel: PostModelType) {}
@@ -9,7 +8,7 @@ export class PostsRepository {
     return _id.toString();
   }
 
-  async findPostById(id: ObjectId) {
+  async findPostById(id: string) {
     return this.postModel.findOne({ _id: id, deletedAt: null });
   }
 }

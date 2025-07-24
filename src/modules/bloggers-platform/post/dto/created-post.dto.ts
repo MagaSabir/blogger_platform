@@ -3,4 +3,5 @@ export class CreatedPostDto {
   shortDescription: string;
   content: string;
   blogId: string;
+  blogName?: string;
 }

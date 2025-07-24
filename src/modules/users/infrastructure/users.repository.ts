@@ -7,4 +7,8 @@ export class UsersRepository {
     const { _id } = await dto.save();
     return _id.toString();
   }
+
+  async findUser(id: string) {
+    return this.UserModel.findOne({ _id: id, deletedAt: null });
+  }
 }

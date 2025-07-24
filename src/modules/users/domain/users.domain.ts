@@ -26,6 +26,13 @@ export class User {
     user.email = dto.email;
     return user as UserDocument;
   }
+
+  deleteUser(): void {
+    if (this.deletedAt !== null) {
+      throw new Error('Entity already deleted');
+    }
+    this.deletedAt = new Date();
+  }
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

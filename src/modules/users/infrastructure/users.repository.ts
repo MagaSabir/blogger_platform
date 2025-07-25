@@ -8,7 +8,7 @@ export class UsersRepository {
     return _id.toString();
   }
 
-  async findUser(id: string) {
+  async findUser(id: string): Promise<UserDocument | null> {
     return this.UserModel.findOne({ _id: id, deletedAt: null });
   }
 }

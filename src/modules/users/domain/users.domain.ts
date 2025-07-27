@@ -19,7 +19,7 @@ export class User {
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
 
-  static createUser(dto: CreateUserDto) {
+  static createUser(dto: CreateUserDto): UserDocument {
     const user = new this();
     user.login = dto.login;
     user.password = dto.password;

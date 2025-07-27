@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
 import { CreatedBlogDto, UpdateBlogDto } from '../dto/created-blog.dto';
-import { BlogViewDto } from './blog.view-dto';
+import { BlogViewDto } from './view-dto/blog.view-dto';
 import { QueryBlogRepository } from '../infrastructure/query-repository/query.blog.repository';
 import { BlogsQueryParams } from './input-validation-dto/blogs-query-params';
 import { QueryPostRepository } from '../../post/infrastructure/query-repository/query.post.repository';

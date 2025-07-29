@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { CreateUserDto } from '../dto/user.dto';
+import { CreateUserDto } from '../dto/create-user.domain.dto';
 import { HydratedDocument, Model } from 'mongoose';
 
 @Schema({ timestamps: true })

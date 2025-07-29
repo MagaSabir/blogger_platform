@@ -21,6 +21,7 @@ import { BasePaginatedResponse } from '../../../../core/base-paginated-response'
 import { PostViewDto } from '../../post/api/post.view-dto';
 import { PostService } from '../../post/application/post.service';
 import { CreatedPostDto } from '../../post/dto/created-post.dto';
+import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
 
 @Controller('blogs')
 export class BlogsController {
@@ -38,7 +39,9 @@ export class BlogsController {
   }
 
   @Get(':id')
-  async getBlogById(@Param('id') id: string): Promise<BlogViewDto> {
+  async getBlogById(
+    @Param('id', ObjectIdValidationPipe) id: string,
+  ): Promise<BlogViewDto> {
     return await this.blogQueryRepo.getBlog(id);
   }
 

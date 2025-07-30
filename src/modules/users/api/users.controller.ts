@@ -8,14 +8,17 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersQueryRepository } from '../infrastructure/query-repository/users.query-repository';
 import { UsersService } from '../application/users.service';
 import { UsersQueryParams } from './input-dto/users-query-params';
-import { CreateUserInputDto, IdInputDto } from './input-dto/create-user.dto';
+import { CreateUserInputDto } from './input-dto/create-user.dto';
 import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
+import { BasicAuthGuard } from '../guards/basic/basic-auth.guard';
 
 @Controller('users')
+@UseGuards(BasicAuthGuard)
 export class UsersController {
   constructor(
     private userService: UsersService,

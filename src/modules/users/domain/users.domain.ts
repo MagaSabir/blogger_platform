@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CreateUserDto } from '../dto/create-user.domain.dto';
 import { HydratedDocument, Model } from 'mongoose';
+import { add } from 'date-fns';
 
 @Schema({ timestamps: true })
 export class User {
@@ -8,10 +9,19 @@ export class User {
   login: string;
 
   @Prop({ type: String, required: true })
-  password: string;
+  passwordHash: string;
 
   @Prop({ type: String, required: true })
   email: string;
+
+  @Prop({ type: String, required: true })
+  confirmationCode: string;
+
+  @Prop({ type: Date, required: true })
+  confirmationCodeExpiration: Date;
+
+  @Prop({ type: String, required: true, default: false })
+  isEmailConfirmed: boolean;
 
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;
@@ -22,8 +32,9 @@ export class User {
   static createUser(dto: CreateUserDto): UserDocument {
     const user = new this();
     user.login = dto.login;
-    user.password = dto.password;
+    user.passwordHash = dto.passwordHash;
     user.email = dto.email;
+    user.isEmailConfirmed = false;
     return user as UserDocument;
   }
 
@@ -32,6 +43,14 @@ export class User {
       throw new Error('Entity already deleted');
     }
     this.deletedAt = new Date();
+  }
+
+  setConfirmationCode(code: string) {
+    this.confirmationCode = code;
+    this.confirmationCodeExpiration = add(new Date(), {
+      hours: 1,
+      minutes: 30,
+    });
   }
 }
 

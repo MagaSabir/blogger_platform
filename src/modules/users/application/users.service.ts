@@ -1,18 +1,37 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../domain/users.domain';
-import { CreateUserDto } from '../dto/create-user.domain.dto';
 import { UsersRepository } from '../infrastructure/users.repository';
+import { CreateUserInputDto } from '../api/input-dto/create-user.dto';
+import { BcryptService } from './bcrypt.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name) private UserModel: UserModelType,
     private userRepo: UsersRepository,
+    private bcryptService: BcryptService,
   ) {}
 
-  async createUser(dto: CreateUserDto) {
-    const user: UserDocument = this.UserModel.createUser(dto);
+  async createUser(dto: CreateUserInputDto) {
+    const existsUser = await this.userRepo.findUserByLoginOrEmail(
+      dto.login,
+      dto.email,
+    );
+    if (existsUser) {
+      throw new BadRequestException('User already exists');
+    }
+    const passwordHash = await this.bcryptService.hash(dto.password);
+
+    const user: UserDocument = this.UserModel.createUser({
+      login: dto.login,
+      passwordHash,
+      email: dto.email,
+    });
     return this.userRepo.save(user);
   }
 

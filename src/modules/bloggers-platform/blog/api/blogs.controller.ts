@@ -11,7 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
-import { CreatedBlogDto, UpdateBlogDto } from '../dto/created-blog.dto';
+import { UpdateBlogDto } from '../dto/created-blog.dto';
 import { BlogViewDto } from './view-dto/blog.view-dto';
 import { QueryBlogRepository } from '../infrastructure/query-repository/query.blog.repository';
 import { BlogsQueryParams } from './input-validation-dto/blogs-query-params';
@@ -22,6 +22,7 @@ import { PostViewDto } from '../../post/api/post.view-dto';
 import { PostService } from '../../post/application/post.service';
 import { CreatedPostDto } from '../../post/dto/created-post.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
+import { CreateBlogDto } from './input-validation-dto/create-blog.dto';
 
 @Controller('blogs')
 export class BlogsController {
@@ -46,7 +47,7 @@ export class BlogsController {
   }
 
   @Post()
-  async createBlog(@Body() body: CreatedBlogDto): Promise<BlogViewDto> {
+  async createBlog(@Body() body: CreateBlogDto): Promise<BlogViewDto> {
     const id: string = await this.blogService.createBlog(body);
     return this.blogQueryRepo.getBlog(id);
   }

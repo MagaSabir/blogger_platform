@@ -27,6 +27,7 @@ export class UsersController {
 
   @Get()
   async getUsers(@Query() query: UsersQueryParams) {
+    console.log(query);
     return await this.userQueryRepo.getUsers(query);
   }
 

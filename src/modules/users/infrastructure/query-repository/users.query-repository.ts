@@ -3,8 +3,8 @@ import { User, UserDocument, UserModelType } from '../../domain/users.domain';
 import { UsersQueryParams } from '../../api/input-dto/users-query-params';
 import { FilterQuery } from 'mongoose';
 import { UserViewDto } from '../../api/view-dto/user.view-dto';
-import { NotFoundException } from '@nestjs/common';
-
+import { Injectable, NotFoundException } from '@nestjs/common';
+@Injectable()
 export class UsersQueryRepository {
   constructor(@InjectModel(User.name) private userModel: UserModelType) {}
 

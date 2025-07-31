@@ -1,6 +1,5 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../domain/users.domain';
-import { Types } from 'mongoose';
 
 export class UsersRepository {
   constructor(@InjectModel(User.name) private UserModel: UserModelType) {}
@@ -13,7 +12,14 @@ export class UsersRepository {
     return this.UserModel.findOne({ _id: id, deletedAt: null });
   }
 
-  async findUserByLoginOrEmail(login: string, email: string) {
-    return this.UserModel.findOne({ $or: [{ login }, { email }] });
+  async findUserByLoginOrEmail(login: string, email?: string) {
+    return this.UserModel.findOne({
+      $or: [{ login }, { email }],
+      deletedAt: null,
+    });
+  }
+
+  async findUserByCode(code: string) {
+    return this.UserModel.findOne({ confirmationCode: code, deletedAt: null });
   }
 }

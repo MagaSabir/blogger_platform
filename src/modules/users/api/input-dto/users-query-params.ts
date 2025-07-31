@@ -2,6 +2,7 @@ import { BaseQueryParams } from '../../../../core/base-query-params.dto';
 import { IsOptional, IsString } from 'class-validator';
 
 export class UsersQueryParams extends BaseQueryParams {
+  @IsOptional()
   sortBy: string = 'createdAt';
   @IsString()
   @IsOptional()

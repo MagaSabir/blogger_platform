@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CreateUserDto } from '../dto/create-user.domain.dto';
 import { HydratedDocument, Model } from 'mongoose';
 import { add } from 'date-fns';
+import { BadRequestException } from '@nestjs/common';
 
 @Schema({ timestamps: true })
 export class User {
@@ -14,10 +15,10 @@ export class User {
   @Prop({ type: String, required: true })
   email: string;
 
-  @Prop({ type: String, required: true })
+  @Prop({ type: String })
   confirmationCode: string;
 
-  @Prop({ type: Date, required: true })
+  @Prop({ type: Date })
   confirmationCodeExpiration: Date;
 
   @Prop({ type: String, required: true, default: false })
@@ -51,6 +52,17 @@ export class User {
       hours: 1,
       minutes: 30,
     });
+  }
+
+  confirmation(code: string) {
+    if (code !== this.confirmationCode) {
+      throw new BadRequestException('confirmation code is incorrect');
+    }
+    if (this.confirmationCodeExpiration < new Date()) {
+      throw new BadRequestException('CodeExpiration');
+    }
+
+    this.isEmailConfirmed = true;
   }
 }
 

@@ -12,6 +12,8 @@ import { CreateUserInputDto } from './input-dto/create-user.dto';
 import { LocalAuthGuard } from '../guards/local/local.auth.guard';
 import { JwtAuthGuard } from '../guards/bearer/jwt-auth.guard';
 import { AuthQueryRepository } from '../infrastructure/query-repository/auth.query-repository';
+import { InputCodeValidation } from './input-dto/input-code-validation';
+import { InputEmailValidation } from './input-dto/input-email-validation';
 
 @Controller('auth')
 export class AuthController {
@@ -29,9 +31,7 @@ export class AuthController {
   @Post('login')
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
-  login(
-    @Req() req: { user: { id: string } },
-  ): Promise<{ accessToken: string }> {
+  login(@Req() req: { user: { id: string } }): { accessToken: string } {
     return this.authService.login(req.user.id);
   }
 
@@ -43,7 +43,13 @@ export class AuthController {
 
   @Post('registration-confirmation')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async confirmation(@Body() body: { code: string }) {
+  async confirmation(@Body() body: InputCodeValidation) {
     await this.authService.confirmation(body.code);
+  }
+
+  @Post('registration-email-resending')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async registrationEmailResending(@Body() body: InputEmailValidation) {
+    await this.authService.registrationResending(body.email);
   }
 }

@@ -21,7 +21,7 @@ export class User {
   @Prop({ type: Date })
   confirmationCodeExpiration: Date;
 
-  @Prop({ type: String, required: true, default: false })
+  @Prop({ type: Boolean, required: true, default: false })
   isEmailConfirmed: boolean;
 
   @Prop({ type: Date, default: Date.now })

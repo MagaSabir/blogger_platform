@@ -12,11 +12,16 @@ export class UsersRepository {
     return this.UserModel.findOne({ _id: id, deletedAt: null });
   }
 
-  async findUserByLoginOrEmail(login: string, email?: string) {
-    return this.UserModel.findOne({
+  async findUserByLoginOrEmail(
+    login?: string,
+    email?: string,
+  ): Promise<UserDocument | null> {
+    const user = await this.UserModel.findOne({
       $or: [{ login }, { email }],
       deletedAt: null,
     });
+
+    return user;
   }
 
   async findUserByCode(code: string) {

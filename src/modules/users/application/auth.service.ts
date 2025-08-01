@@ -18,13 +18,29 @@ export class AuthService {
     private emailService: EmailService,
   ) {}
   async registration(dto: CreateUserInputDto) {
-    const existsUser = await this.userRepo.findUserByLoginOrEmail(
-      dto.login,
-      dto.email,
-    );
-    console.log(existsUser);
+    const existsUser: UserDocument | null =
+      await this.userRepo.findUserByLoginOrEmail(dto.login, dto.email);
     if (existsUser) {
-      throw new BadRequestException('User already exists');
+      if (existsUser.login === dto.login) {
+        throw new BadRequestException({
+          errorsMessages: [
+            {
+              message: 'Login already exists',
+              field: 'login',
+            },
+          ],
+        });
+      }
+      if (existsUser.email === dto.email) {
+        throw new BadRequestException({
+          errorsMessages: [
+            {
+              message: 'Email already exists',
+              field: 'email',
+            },
+          ],
+        });
+      }
     }
 
     const passwordHash = await this.bcryptService.hash(dto.password);
@@ -38,8 +54,7 @@ export class AuthService {
     const code = uuidv4();
 
     user.setConfirmationCode(code);
-    console.log(user);
-    await user.save();
+    await this.userRepo.save(user);
     this.emailService.sendConfirmationEmail(user.email, code);
   }
 
@@ -58,7 +73,7 @@ export class AuthService {
     return { id: user._id.toString() };
   }
 
-  async login(userId: string) {
+  login(userId: string) {
     const accessToken = this.jwtService.sign({ userId });
 
     return { accessToken };
@@ -66,15 +81,37 @@ export class AuthService {
 
   async confirmation(code: string) {
     const user: UserDocument | null = await this.userRepo.findUserByCode(code);
-    console.log(user);
-    if (!user) {
-      throw new BadRequestException();
-    }
-    if (user.isEmailConfirmed) {
-      throw new BadRequestException('as');
+    if (!user || user.isEmailConfirmed) {
+      throw new BadRequestException({
+        errorsMessages: [
+          {
+            message: 'Email  is confirmed or not found',
+            field: 'code',
+          },
+        ],
+      });
     }
 
     user.confirmation(code);
-    await user.save();
+    await this.userRepo.save(user);
+  }
+
+  async registrationResending(email: string) {
+    const user = await this.userRepo.findUserByLoginOrEmail(undefined, email);
+    if (!user || user.isEmailConfirmed) {
+      throw new BadRequestException({
+        errorsMessages: [
+          {
+            message: 'Email  is confirmed',
+            field: 'email',
+          },
+        ],
+      });
+    }
+    const code = uuidv4();
+
+    user.setConfirmationCode(code);
+    await this.userRepo.save(user);
+    this.emailService.sendConfirmationEmail(user.email, code);
   }
 }

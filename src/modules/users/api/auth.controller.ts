@@ -14,6 +14,7 @@ import { JwtAuthGuard } from '../guards/bearer/jwt-auth.guard';
 import { AuthQueryRepository } from '../infrastructure/query-repository/auth.query-repository';
 import { InputCodeValidation } from './input-dto/input-code-validation';
 import { InputEmailValidation } from './input-dto/input-email-validation';
+import { InputNewPasswordDto } from './input-dto/input-new-password.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -51,5 +52,17 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async registrationEmailResending(@Body() body: InputEmailValidation) {
     await this.authService.registrationResending(body.email);
+  }
+
+  @Post('password-recovery')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async passwordRecovery(@Body() body: InputEmailValidation) {
+    await this.authService.passwordRecovery(body.email);
+  }
+
+  @Post('new-password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async newPassword(@Body() body: InputNewPasswordDto) {
+    await this.authService.newPassword(body.newPassword, body.recoveryCode);
   }
 }

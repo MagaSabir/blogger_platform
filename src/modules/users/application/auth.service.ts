@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateUserInputDto } from '../api/input-dto/create-user.dto';
 import { UsersRepository } from '../infrastructure/users.repository';
 import { BcryptService } from './bcrypt.service';
@@ -102,10 +97,8 @@ export class AuthService {
   }
 
   async registrationResending(email: string) {
-    const user: UserDocument = await this.userRepo.findUserByLoginOrEmail(
-      undefined,
-      email,
-    );
+    const user: UserDocument | null =
+      await this.userRepo.findUserByLoginOrEmail(undefined, email);
     if (!user || user.isEmailConfirmed) {
       throw new BadRequestException({
         errorsMessages: [
@@ -125,12 +118,29 @@ export class AuthService {
 
   async passwordRecovery(email: string) {
     const user: UserDocument | null =
-      await this.userRepo.findUserByLoginOrEmail(email);
-    if (!user) {
-      throw new HttpException('no content', HttpStatus.NO_CONTENT);
-    }
-
+      await this.userRepo.findUserByLoginOrEmail(undefined, email);
+    if (!user) return;
     const code = uuidv4();
-    user.confirmationCode(code);
+    user.setConfirmationCode(code);
+    await this.userRepo.save(user);
+    this.emailService.sendConfirmationEmail(user.email, code);
+  }
+
+  async newPassword(newPassword: string, recoveryCode: string) {
+    const user: UserDocument | null =
+      await this.userRepo.findUserByCode(recoveryCode);
+    if (!user)
+      throw new BadRequestException({
+        errorsMessages: [
+          {
+            message: 'Email  is confirmed',
+            field: 'email',
+          },
+        ],
+      });
+    user.passwordHash = await this.bcryptService.hash(newPassword);
+    user.isEmailConfirmed = true;
+    console.log(user);
+    await this.userRepo.save(user);
   }
 }

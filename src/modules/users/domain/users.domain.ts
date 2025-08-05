@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { CreateUserDto } from '../dto/create-user.domain.dto';
+import { CreateUserDto } from './dto/create-user.domain.dto';
 import { HydratedDocument, Model } from 'mongoose';
 import { add } from 'date-fns';
 import { BadRequestException } from '@nestjs/common';

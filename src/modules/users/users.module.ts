@@ -14,10 +14,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './guards/local/local.strategy';
 import { AuthQueryRepository } from './infrastructure/query-repository/auth.query-repository';
 import { JwtStrategy } from './guards/bearer/jwt-strategy';
-import { EmailService } from '../notification/email.service';
+import { CreateUserUseCase } from './application/usecases/admins/create-user.usecase';
+import { CqrsModule } from '@nestjs/cqrs';
 
+const commandHandlers = [CreateUserUseCase];
 @Module({
   imports: [
+    CqrsModule,
     JwtModule.register({
       secret: 'access-token-secret',
       signOptions: { expiresIn: '60m' },
@@ -36,6 +39,7 @@ import { EmailService } from '../notification/email.service';
     BcryptService,
     LocalStrategy,
     JwtStrategy,
+    ...commandHandlers,
   ],
 })
 export class UsersModule {}

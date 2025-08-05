@@ -16,12 +16,15 @@ import { UsersQueryParams } from './input-dto/users-query-params';
 import { CreateUserInputDto } from './input-dto/create-user.dto';
 import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
 import { BasicAuthGuard } from '../guards/basic/basic-auth.guard';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from '../application/usecases/admins/create-user.usecase';
 
 @Controller('users')
 @UseGuards(BasicAuthGuard)
 export class UsersController {
   constructor(
     private userService: UsersService,
+    private commandBus: CommandBus,
     private userQueryRepo: UsersQueryRepository,
   ) {}
 
@@ -33,7 +36,10 @@ export class UsersController {
 
   @Post()
   async createUser(@Body() dto: CreateUserInputDto) {
-    const userId = await this.userService.createUser(dto);
+    const userId: string = await this.commandBus.execute<
+      CreateUserCommand,
+      string
+    >(new CreateUserCommand(dto));
     return await this.userQueryRepo.getUser(userId);
   }
 

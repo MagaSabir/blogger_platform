@@ -8,7 +8,7 @@ import {
 } from '../../../domain/users.domain';
 import { UsersRepository } from '../../../infrastructure/users.repository';
 import { BadRequestException } from '@nestjs/common';
-import { BcryptService } from '../../bcrypt.service';
+import { BcryptService } from '../../service/bcrypt.service';
 
 export class CreateUserCommand {
   constructor(public dto: CreateUserDto) {}

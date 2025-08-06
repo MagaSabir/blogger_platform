@@ -3,7 +3,7 @@ import { UsersRepository } from '../../infrastructure/users.repository';
 import { BcryptService } from './bcrypt.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../../domain/users.domain';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 import { JwtService } from '@nestjs/jwt';
 import { EmailService } from '../../../notification/email.service';
 
@@ -108,7 +108,7 @@ export class AuthService {
         ],
       });
     }
-    const code = uuidv4();
+    const code = randomUUID();
 
     user.setConfirmationCode(code);
     await this.userRepo.save(user);
@@ -119,7 +119,7 @@ export class AuthService {
     const user: UserDocument | null =
       await this.userRepo.findUserByLoginOrEmail(undefined, email);
     if (!user) return;
-    const code = uuidv4();
+    const code = randomUUID();
     user.setConfirmationCode(code);
     await this.userRepo.save(user);
     this.emailService.sendConfirmationEmail(user.email, code);

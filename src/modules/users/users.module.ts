@@ -10,15 +10,41 @@ import { BasicStrategy } from './guards/basic/basic.strategy';
 import { AuthService } from './application/service/auth.service';
 import { AuthController } from './api/auth.controller';
 import { BcryptService } from './application/service/bcrypt.service';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
 import { LocalStrategy } from './guards/local/local.strategy';
 import { AuthQueryRepository } from './infrastructure/query-repository/auth.query-repository';
 import { JwtStrategy } from './guards/bearer/jwt-strategy';
 import { CreateUserUseCase } from './application/usecases/admins/create-user.usecase';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegisterUserUseCase } from './application/usecases/register-user.usecase';
+import { LoginUserUseCase } from './application/usecases/login-user';
 
-const commandHandlers = [CreateUserUseCase, RegisterUserUseCase];
+const refreshTokenConnectionProvider = [
+  {
+    provide: 'ACCESS-TOKEN',
+    useFactory: (): JwtService => {
+      return new JwtService({
+        secret: 'access-secret',
+        signOptions: { expiresIn: 10 },
+      });
+    },
+  },
+
+  {
+    provide: 'REFRESH-TOKEN',
+    useFactory: (): JwtService => {
+      return new JwtService({
+        secret: 'refresh-secret',
+        signOptions: { expiresIn: 10 },
+      });
+    },
+  },
+];
+const commandHandlers = [
+  LoginUserUseCase,
+  CreateUserUseCase,
+  RegisterUserUseCase,
+];
 @Module({
   imports: [
     CqrsModule,
@@ -41,6 +67,7 @@ const commandHandlers = [CreateUserUseCase, RegisterUserUseCase];
     LocalStrategy,
     JwtStrategy,
     ...commandHandlers,
+    ...refreshTokenConnectionProvider,
   ],
 })
 export class UsersModule {}

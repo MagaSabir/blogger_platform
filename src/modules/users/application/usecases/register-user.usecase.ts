@@ -17,7 +17,7 @@ export class RegisterUserUseCase {
   constructor(
     @InjectModel(User.name) private UserModel: UserModelType,
     private bcryptService: BcryptService,
-    private eveBus: EventBus,
+    private eventBus: EventBus,
     private userRepo: UsersRepository,
   ) {}
 
@@ -60,6 +60,6 @@ export class RegisterUserUseCase {
     user.setConfirmationCode(code);
     await this.userRepo.save(user);
 
-    this.eveBus.publish(new UserRegisteredEvent(user.email, code));
+    this.eventBus.publish(new UserRegisteredEvent(user.email, code));
   }
 }

@@ -17,14 +17,16 @@ import { JwtStrategy } from './guards/bearer/jwt-strategy';
 import { CreateUserUseCase } from './application/usecases/admins/create-user.usecase';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegisterUserUseCase } from './application/usecases/register-user.usecase';
-import { LoginUserUseCase } from './application/usecases/login-user';
+import { LoginUserUseCase } from './application/usecases/login-user.usecase';
+import { GetAllUsersQueryHandler } from './application/queries/get-all-users.query';
+import { GetUserByIdHandler } from './application/queries/get-user-byId.query';
 
 const refreshTokenConnectionProvider = [
   {
     provide: 'ACCESS-TOKEN',
     useFactory: (): JwtService => {
       return new JwtService({
-        secret: 'access-secret',
+        secret: 'access-token-secret',
         signOptions: { expiresIn: 10 },
       });
     },
@@ -45,13 +47,11 @@ const commandHandlers = [
   CreateUserUseCase,
   RegisterUserUseCase,
 ];
+const queryHandler = [GetAllUsersQueryHandler, GetUserByIdHandler];
 @Module({
   imports: [
     CqrsModule,
-    JwtModule.register({
-      secret: 'access-token-secret',
-      signOptions: { expiresIn: '60m' },
-    }),
+    JwtModule,
     PassportModule,
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
   ],
@@ -68,6 +68,8 @@ const commandHandlers = [
     JwtStrategy,
     ...commandHandlers,
     ...refreshTokenConnectionProvider,
+    ...queryHandler,
   ],
+  exports: [JwtStrategy],
 })
 export class UsersModule {}

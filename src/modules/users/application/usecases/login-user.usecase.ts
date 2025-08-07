@@ -7,21 +7,13 @@ export class LoginUserCommand {
   constructor(public dto: { userId: string }) {}
 }
 @CommandHandler(LoginUserCommand)
-export class LoginUserUseCase
-  implements
-    ICommandHandler<
-      LoginUserCommand,
-      { accessToken: string; refreshToken: string }
-    >
-{
+export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
   constructor(
     @Inject('ACCESS-TOKEN') private accessTokenContext: JwtService,
     @Inject('REFRESH-TOKEN') private refreshTokenContext: JwtService,
   ) {}
 
-  async execute({
-    dto,
-  }: LoginUserCommand): Promise<{ accessToken: string; refreshToken: string }> {
+  execute({ dto }: LoginUserCommand) {
     const deviceId = randomUUID();
     const accessToken = this.accessTokenContext.sign({ id: dto.userId });
     const refreshToken = this.refreshTokenContext.sign({
@@ -29,9 +21,9 @@ export class LoginUserUseCase
       deviceId,
     });
 
-    return {
+    return Promise.resolve({
       accessToken,
       refreshToken,
-    };
+    });
   }
 }

@@ -19,7 +19,7 @@ import { InputEmailValidation } from './input-dto/input-email-validation';
 import { InputNewPasswordDto } from './input-dto/input-new-password.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/usecases/register-user.usecase';
-import { LoginUserCommand } from '../application/usecases/login-user';
+import { LoginUserCommand } from '../application/usecases/login-user.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -39,9 +39,13 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
   async login(@Req() req: { user: { id: string } }, @Res() res: Response) {
-    const { accessToken, refreshToken } = await this.commandBus.execute(
-      new LoginUserCommand({ userId: req.user.id }),
-    );
+    const {
+      accessToken,
+      refreshToken,
+    }: { accessToken: string; refreshToken: string } =
+      await this.commandBus.execute(
+        new LoginUserCommand({ userId: req.user.id }),
+      );
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,

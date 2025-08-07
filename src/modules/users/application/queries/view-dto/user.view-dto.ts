@@ -1,4 +1,4 @@
-import { UserDocument } from '../../domain/users.domain';
+import { UserDocument } from '../../../domain/users.domain';
 
 export class UserViewDto {
   id: string;

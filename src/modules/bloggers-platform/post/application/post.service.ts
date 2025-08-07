@@ -14,6 +14,8 @@ export class PostService {
   ) {}
   async createPost(dto: CreatedPostDto): Promise<string> {
     const blog = await this.blogRepo.findBlogById(dto.blogId);
+    console.log(dto);
+
     if (!blog) throw new NotFoundException('Blog not found');
     const post: PostDocument = this.PostModel.createdPost(dto, blog.name);
     return this.postRepo.save(post);

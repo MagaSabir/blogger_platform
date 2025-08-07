@@ -20,6 +20,7 @@ import { InputNewPasswordDto } from './input-dto/input-new-password.dto';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/usecases/register-user.usecase';
 import { LoginUserCommand } from '../application/usecases/login-user.usecase';
+import { PasswordRecoveryCommand } from '../application/usecases/password-recovery.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -74,7 +75,7 @@ export class AuthController {
   @Post('password-recovery')
   @HttpCode(HttpStatus.NO_CONTENT)
   async passwordRecovery(@Body() body: InputEmailValidation) {
-    await this.authService.passwordRecovery(body.email);
+    await this.commandBus.execute(new PasswordRecoveryCommand(body.email));
   }
 
   @Post('new-password')

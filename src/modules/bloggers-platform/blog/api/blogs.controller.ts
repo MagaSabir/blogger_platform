@@ -19,7 +19,7 @@ import { QueryPostRepository } from '../../post/infrastructure/query-repository/
 import { PostsQueryParams } from '../../post/api/input-validation-dto/PostsQueryParams';
 import { BasePaginatedResponse } from '../../../../core/base-paginated-response';
 import { PostViewDto } from '../../post/api/post.view-dto';
-import { PostService } from '../../post/application/post.service';
+import { PostService } from '../../post/application/service/post.service';
 import { CreatedPostDto } from '../../post/dto/created-post.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
 import { CreateBlogDto } from './input-validation-dto/create-blog.dto';

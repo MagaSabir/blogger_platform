@@ -6,7 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Blog, BlogSchema } from './blog/domain/blog.entity';
 import { QueryBlogRepository } from './blog/infrastructure/query-repository/query.blog.repository';
 import { PostController } from './post/api/post.controller';
-import { PostService } from './post/application/post.service';
+import { PostService } from './post/application/service/post.service';
 import { PostsRepository } from './post/infrastructure/posts.repository';
 import { QueryPostRepository } from './post/infrastructure/query-repository/query.post.repository';
 import { Post, PostSchema } from './post/domain/post.entity';
@@ -17,7 +17,6 @@ import { CommentController } from './comments/api/comment.controller';
 import { CommentCreateUseCase } from './comments/application/usecases/comment-create.usecase';
 import { GetCommentHandler } from './comments/application/queries/get-comment.query';
 import { CqrsModule } from '@nestjs/cqrs';
-import { JwtStrategy } from '../users/guards/bearer/jwt-strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 
@@ -44,7 +43,6 @@ import { UsersModule } from '../users/users.module';
     CommentQueryRepository,
     CommentCreateUseCase,
     GetCommentHandler,
-    JwtStrategy,
   ],
 })
 export class BloggersPlatformModule {}

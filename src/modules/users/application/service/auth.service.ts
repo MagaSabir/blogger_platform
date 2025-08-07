@@ -72,11 +72,11 @@ export class AuthService {
     return { id: user._id.toString() };
   }
 
-  login(userId: string) {
-    const accessToken = this.jwtService.sign({ userId });
-
-    return { accessToken };
-  }
+  // login(userId: string) {
+  //   const accessToken = this.jwtService.sign({ userId });
+  //
+  //   return { accessToken };
+  // }
 
   async confirmation(code: string) {
     const user: UserDocument | null = await this.userRepo.findUserByCode(code);
@@ -115,15 +115,15 @@ export class AuthService {
     this.emailService.sendConfirmationEmail(user.email, code);
   }
 
-  async passwordRecovery(email: string) {
-    const user: UserDocument | null =
-      await this.userRepo.findUserByLoginOrEmail(undefined, email);
-    if (!user) return;
-    const code = randomUUID();
-    user.setConfirmationCode(code);
-    await this.userRepo.save(user);
-    this.emailService.sendConfirmationEmail(user.email, code);
-  }
+  // async passwordRecovery(email: string) {
+  //   const user: UserDocument | null =
+  //     await this.userRepo.findUserByLoginOrEmail(undefined, email);
+  //   if (!user) return;
+  //   const code = randomUUID();
+  //   user.setConfirmationCode(code);
+  //   await this.userRepo.save(user);
+  //   this.emailService.sendConfirmationEmail(user.email, code);
+  // }
 
   async newPassword(newPassword: string, recoveryCode: string) {
     const user: UserDocument | null =

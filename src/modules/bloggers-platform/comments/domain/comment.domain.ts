@@ -1,9 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { UserSchema } from '../../../users/domain/users.domain';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 
-@Schema({ timestamps: true })
+@Schema()
 export class Comments {
   @Prop({ type: String, required: true })
   content: string;
@@ -23,6 +22,9 @@ export class Comments {
     userLogin: string;
   };
 
+  @Prop({ type: Date, default: Date.now })
+  createdAt: Date;
+
   @Prop({ type: Number, required: true, default: 0 })
   likesCount: number;
 
@@ -34,16 +36,19 @@ export class Comments {
 
   static createComment(dto: CreateCommentDto) {
     const comment = new this();
+    comment.commentatorInfo = {
+      userId: dto.user.userId,
+      userLogin: dto.user.userLogin,
+    };
     comment.content = dto.content;
     comment.postId = dto.postId;
-    comment.commentatorInfo.userId = dto.user.userId;
-    comment.commentatorInfo.userLogin = dto.user.userLogin;
+
     return comment as CommentDocument;
   }
 }
 
 export const CommentSchema = SchemaFactory.createForClass(Comments);
-UserSchema.loadClass(Comments);
+CommentSchema.loadClass(Comments);
 
 export type CommentDocument = HydratedDocument<Comments>;
 export type CommentModelType = Model<CommentDocument> & typeof Comments;

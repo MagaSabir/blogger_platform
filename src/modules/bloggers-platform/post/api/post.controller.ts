@@ -13,7 +13,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CreatedPostDto } from '../dto/created-post.dto';
-import { PostService } from '../application/post.service';
+import { PostService } from '../application/service/post.service';
 import { QueryPostRepository } from '../infrastructure/query-repository/query.post.repository';
 import { PostViewDto } from './post.view-dto';
 import { PostsQueryParams } from './input-validation-dto/PostsQueryParams';
@@ -69,7 +69,7 @@ export class PostController {
     @Param('id') postId: string,
     @Req() req: { user: { id: string } },
   ) {
-    console.log(req.user.id);
+    console.log(req.user);
     const user: UserViewDto = await this.queryBus.execute<
       GetUserByIdQuery,
       UserViewDto

@@ -1,24 +1,20 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { CommentModelType, Comments } from '../../domain/comment.domain';
+import {
+  CommentDocument,
+  CommentModelType,
+  Comments,
+} from '../../domain/comment.domain';
+import { CommentViewDto } from '../../application/queries/view-dto/comment.view-dto';
 
 export class CommentQueryRepository {
   constructor(
     @InjectModel(Comments.name) private CommentModel: CommentModelType,
   ) {}
   async getCommentById(commentId: string) {
-    const comment = await this.CommentModel.findById(commentId);
-    console.log(comment);
+    const comment: CommentDocument | null =
+      await this.CommentModel.findById(commentId);
 
     if (!comment) return null;
-    return {
-      id: comment._id.toString(),
-      content: comment.content,
-      commentatorInfo: comment.commentatorInfo,
-      likesInfo: {
-        likesCount: comment.likesCount,
-        dislikesCount: comment.dislikesCount,
-        myStatus: 'None',
-      },
-    };
+    return CommentViewDto.mapToView(comment);
   }
 }

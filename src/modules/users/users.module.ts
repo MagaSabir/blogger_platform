@@ -20,6 +20,10 @@ import { RegisterUserUseCase } from './application/usecases/register-user.usecas
 import { LoginUserUseCase } from './application/usecases/login-user.usecase';
 import { GetAllUsersQueryHandler } from './application/queries/get-all-users.query';
 import { GetUserByIdHandler } from './application/queries/get-user-byId.query';
+import { RegistrationResendingUseCase } from './application/usecases/registration-resending.usecase';
+import { PasswordRecoveryUseCase } from './application/usecases/password-recovery.usecase';
+import { ConfirmationUseCase } from './application/usecases/confirmation.usecase';
+import { DeleteUserCase } from './application/usecases/admins/delete-user.usecase';
 
 const refreshTokenConnectionProvider = [
   {
@@ -46,6 +50,10 @@ const commandHandlers = [
   LoginUserUseCase,
   CreateUserUseCase,
   RegisterUserUseCase,
+  RegistrationResendingUseCase,
+  PasswordRecoveryUseCase,
+  ConfirmationUseCase,
+  DeleteUserCase,
 ];
 const queryHandler = [GetAllUsersQueryHandler, GetUserByIdHandler];
 @Module({

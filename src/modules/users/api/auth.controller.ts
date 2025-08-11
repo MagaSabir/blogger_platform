@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -21,6 +22,9 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/usecases/register-user.usecase';
 import { LoginUserCommand } from '../application/usecases/login-user.usecase';
 import { PasswordRecoveryCommand } from '../application/usecases/password-recovery.usecase';
+import { NewPasswordCommand } from '../application/usecases/new-password.usecase';
+import { ConfirmationCommand } from '../application/usecases/confirmation.usecase';
+import { RegistrationResendingCommand } from '../application/usecases/registration-resending.usecase';
 
 @Controller('auth')
 export class AuthController {
@@ -54,7 +58,7 @@ export class AuthController {
     res.json({ accessToken: accessToken });
   }
 
-  @Post('me')
+  @Get('me')
   @UseGuards(JwtAuthGuard)
   async me(@Req() req: { user: { id: string } }) {
     return this.authQueryRepo.getUser(req.user.id);
@@ -63,13 +67,13 @@ export class AuthController {
   @Post('registration-confirmation')
   @HttpCode(HttpStatus.NO_CONTENT)
   async confirmation(@Body() body: InputCodeValidation) {
-    await this.authService.confirmation(body.code);
+    await this.commandBus.execute(new ConfirmationCommand(body.code));
   }
 
   @Post('registration-email-resending')
   @HttpCode(HttpStatus.NO_CONTENT)
   async registrationEmailResending(@Body() body: InputEmailValidation) {
-    await this.authService.registrationResending(body.email);
+    await this.commandBus.execute(new RegistrationResendingCommand(body.email));
   }
 
   @Post('password-recovery')
@@ -81,6 +85,8 @@ export class AuthController {
   @Post('new-password')
   @HttpCode(HttpStatus.NO_CONTENT)
   async newPassword(@Body() body: InputNewPasswordDto) {
-    await this.authService.newPassword(body.newPassword, body.recoveryCode);
+    await this.commandBus.execute(
+      new NewPasswordCommand(body.newPassword, body.recoveryCode),
+    );
   }
 }

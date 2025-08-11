@@ -24,6 +24,7 @@ import { GetUserByIdQuery } from '../../../users/application/queries/get-user-by
 import { UserViewDto } from '../../../users/application/queries/view-dto/user.view-dto';
 import { GetCommentQuery } from '../../comments/application/queries/get-comment.query';
 import { CreateInputBlogDto } from './input-validation-dto/create-blog.input.dto';
+import { CommentCommentDto } from '../../comments/api/input-dto/comment-comment.dto';
 
 @Controller('posts')
 export class PostController {
@@ -65,7 +66,7 @@ export class PostController {
   @Post(':id/comments')
   @UseGuards(JwtAuthGuard)
   async createComment(
-    @Body('content') content: string,
+    @Body('content') body: CommentCommentDto,
     @Param('id') postId: string,
     @Req() req: { user: { id: string } },
   ) {
@@ -75,7 +76,7 @@ export class PostController {
       UserViewDto
     >(new GetUserByIdQuery(req.user.id));
     const dto = {
-      content: content,
+      content: body.content,
       postId: postId,
       user: { userId: req.user.id, userLogin: user.login },
     };

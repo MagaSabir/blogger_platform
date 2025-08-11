@@ -2,6 +2,6 @@ import { IsString, Length } from 'class-validator';
 
 export class CommentCommentDto {
   @IsString()
-  @Length(20, 300)
+  @Length(2, 300)
   content: string;
 }

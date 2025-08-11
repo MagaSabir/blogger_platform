@@ -25,6 +25,10 @@ import { UserViewDto } from '../../../users/application/queries/view-dto/user.vi
 import { GetCommentQuery } from '../../comments/application/queries/get-comment.query';
 import { CreateInputBlogDto } from './input-validation-dto/create-blog.input.dto';
 import { CommentCommentDto } from '../../comments/api/input-dto/comment-comment.dto';
+import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
+import { CommentQueryParams } from '../../comments/api/input-dto/CommentQueryParams';
+import { GetAllCommentsByIdQuery } from '../../comments/application/queries/get-all-comments-by-id.query';
+import { CommentQueryRepository } from '../../comments/infrastructure/query/comment.query.repository';
 
 @Controller('posts')
 export class PostController {
@@ -33,10 +37,10 @@ export class PostController {
     private queryBus: QueryBus,
     private postQueryRepo: QueryPostRepository,
     private postService: PostService,
+    private queryComment: CommentQueryRepository,
   ) {}
   @Post()
   async createPost(@Body() dto: CreateInputBlogDto): Promise<PostViewDto> {
-    console.log(dto.blogId);
     const postId: string = await this.postService.createPost(dto);
     return await this.postQueryRepo.getPostById(postId);
   }
@@ -66,11 +70,10 @@ export class PostController {
   @Post(':id/comments')
   @UseGuards(JwtAuthGuard)
   async createComment(
-    @Body('content') body: CommentCommentDto,
-    @Param('id') postId: string,
+    @Body() body: CommentCommentDto,
+    @Param('id', ObjectIdValidationPipe) postId: string,
     @Req() req: { user: { id: string } },
   ) {
-    console.log(req.user);
     const user: UserViewDto = await this.queryBus.execute<
       GetUserByIdQuery,
       UserViewDto
@@ -86,6 +89,20 @@ export class PostController {
     >(new CommentCreateCommand(dto));
     return await this.queryBus.execute<GetCommentQuery, object>(
       new GetCommentQuery(commentId),
+    );
+  }
+
+  @Get(':id/comments')
+  @UseGuards(JwtAuthGuard)
+  async getCommentsByPostId(
+    @Param('id', ObjectIdValidationPipe) postId: string,
+    @Req() req: { user: { id: string } },
+    @Query() query: CommentQueryParams,
+  ) {
+    const userId = req.user?.id ?? null;
+    console.log(userId);
+    return await this.queryBus.execute<GetAllCommentsByIdQuery, object>(
+      new GetAllCommentsByIdQuery(postId, userId, query),
     );
   }
 }

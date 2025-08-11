@@ -19,7 +19,11 @@ import { GetCommentHandler } from './comments/application/queries/get-comment.qu
 import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
+import { UpdateCommentUseCase } from './comments/application/usecases/update-comment.usecase';
+import { GetAllCommentByIdHandler } from './comments/application/queries/get-all-comments-by-id.query';
 
+const queryHandlers = [GetAllCommentByIdHandler, GetCommentHandler];
+const commandHandlers = [CommentCreateUseCase, UpdateCommentUseCase];
 @Module({
   imports: [
     JwtModule,
@@ -41,8 +45,8 @@ import { UsersModule } from '../users/users.module';
     QueryPostRepository,
     CommentRepository,
     CommentQueryRepository,
-    CommentCreateUseCase,
-    GetCommentHandler,
+    ...commandHandlers,
+    ...queryHandlers,
   ],
 })
 export class BloggersPlatformModule {}

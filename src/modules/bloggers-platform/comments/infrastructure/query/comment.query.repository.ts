@@ -5,16 +5,81 @@ import {
   Comments,
 } from '../../domain/comment.domain';
 import { CommentViewDto } from '../../application/queries/view-dto/comment.view-dto';
+import { NotFoundException } from '@nestjs/common';
+import { CommentQueryParams } from '../../api/input-dto/CommentQueryParams';
 
 export class CommentQueryRepository {
   constructor(
     @InjectModel(Comments.name) private CommentModel: CommentModelType,
   ) {}
   async getCommentById(commentId: string) {
-    const comment: CommentDocument | null =
-      await this.CommentModel.findById(commentId);
+    const comment: CommentDocument | null = await this.CommentModel.findOne({
+      _id: commentId,
+      deletedAt: null,
+    });
 
     if (!comment) return null;
     return CommentViewDto.mapToView(comment);
+  }
+
+  async findCommentOrThrowNotFound(
+    commentId: string,
+  ): Promise<CommentDocument> {
+    const comment: CommentDocument | null = await this.CommentModel.findOne({
+      _id: commentId,
+      deletedAt: null,
+    });
+    if (!comment) {
+      throw new NotFoundException('Comment Not Found');
+    }
+    return comment;
+  }
+
+  async getComments(
+    postId: string,
+    userId: string,
+    queries: CommentQueryParams,
+  ) {
+    const totalCountPosts: number = await this.CommentModel.countDocuments({
+      postId: postId,
+      deletedAt: null,
+    });
+
+    const comments = await this.CommentModel.find({
+      postId: postId,
+      deletedAt: null,
+    })
+      .skip((queries.pageNumber - 1) * queries.pageSize)
+      .limit(queries.pageSize)
+      .sort({ [queries.sortBy]: queries.sortDirection })
+      .lean();
+
+    // const commentId = comments.map((l) => l._id);
+    // const likes = await LikesModel.find({commentId: {$in: commentId}, userId}).lean()
+    const comment = comments.map((el: CommentDocument) => {
+      // const matchedLikes = likes.find(l => l.commentId === el._id.toString())
+      return {
+        id: el._id.toString(),
+        content: el.content,
+        commentatorInfo: {
+          userId: el.commentatorInfo.userId,
+          userLogin: el.commentatorInfo.userLogin,
+        },
+        createdAt: el.createdAt,
+        likesInfo: {
+          likesCount: el.likesCount,
+          dislikesCount: el.dislikesCount,
+          myStatus: 'None',
+        },
+      };
+    });
+
+    return {
+      pagesCount: Math.ceil(totalCountPosts / queries.pageSize),
+      page: queries.pageNumber,
+      pageSize: queries.pageSize,
+      totalCount: totalCountPosts,
+      items: comment,
+    };
   }
 }

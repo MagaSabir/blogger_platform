@@ -14,13 +14,14 @@ export class DeleteCommentCommand {
 export class DeleteCommentUseCase {
   constructor(private commentRepo: CommentRepository) {}
 
-  async execute(commentId: string, userId: string) {
+  async execute(command: DeleteCommentCommand) {
     const comment: CommentDocument =
-      await this.commentRepo.findCommentByIdOrThrowNotFound(commentId);
-    if (comment.commentatorInfo.userId !== userId) {
+      await this.commentRepo.findCommentByIdOrThrowNotFound(command.commentId);
+    if (comment.commentatorInfo.userId !== command.userId) {
       throw new ForbiddenException();
     }
-    comment.deletedAt = null;
+    console.log(comment);
+    comment.deletedAt = new Date();
     await comment.save();
   }
 }

@@ -21,9 +21,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { UpdateCommentUseCase } from './comments/application/usecases/update-comment.usecase';
 import { GetAllCommentByIdHandler } from './comments/application/queries/get-all-comments-by-id.query';
+import { DeleteCommentUseCase } from './comments/application/usecases/delete-comment.usecase';
 
 const queryHandlers = [GetAllCommentByIdHandler, GetCommentHandler];
-const commandHandlers = [CommentCreateUseCase, UpdateCommentUseCase];
+const commandHandlers = [
+  CommentCreateUseCase,
+  UpdateCommentUseCase,
+  DeleteCommentUseCase,
+];
 @Module({
   imports: [
     JwtModule,

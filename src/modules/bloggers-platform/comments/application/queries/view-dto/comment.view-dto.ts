@@ -1,4 +1,5 @@
 import { CommentDocument } from '../../../domain/comment.domain';
+import { LikeCommentDocument } from '../../../../likes/domain/like-comment.domain';
 
 export class CommentViewDto {
   id: string;
@@ -14,7 +15,10 @@ export class CommentViewDto {
     myStatus: string;
   };
 
-  static mapToView(comment: CommentDocument): CommentViewDto {
+  static mapToView(
+    comment: CommentDocument,
+    likes: LikeCommentDocument | null,
+  ): CommentViewDto {
     const dto = new CommentViewDto();
     dto.id = comment._id.toString();
     dto.content = comment.content;
@@ -26,7 +30,7 @@ export class CommentViewDto {
     dto.likesInfo = {
       likesCount: comment.likesCount,
       dislikesCount: comment.dislikesCount,
-      myStatus: 'None',
+      myStatus: likes ? likes.likeStatus : 'None',
     };
     return dto;
   }

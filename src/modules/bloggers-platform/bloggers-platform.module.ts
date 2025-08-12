@@ -22,12 +22,16 @@ import { UsersModule } from '../users/users.module';
 import { UpdateCommentUseCase } from './comments/application/usecases/update-comment.usecase';
 import { GetAllCommentByIdHandler } from './comments/application/queries/get-all-comments-by-id.query';
 import { DeleteCommentUseCase } from './comments/application/usecases/delete-comment.usecase';
+import { LikeCommentRepository } from './likes/infrastructure/like-comment.repository';
+import { LikeComment, LikeSchema } from './likes/domain/like-comment.domain';
+import { SetLikeUseCase } from './comments/application/usecases/set-like.usecase';
 
 const queryHandlers = [GetAllCommentByIdHandler, GetCommentHandler];
 const commandHandlers = [
   CommentCreateUseCase,
   UpdateCommentUseCase,
   DeleteCommentUseCase,
+  SetLikeUseCase,
 ];
 @Module({
   imports: [
@@ -38,6 +42,7 @@ const commandHandlers = [
       { name: Blog.name, schema: BlogSchema },
       { name: Post.name, schema: PostSchema },
       { name: Comments.name, schema: CommentSchema },
+      { name: LikeComment.name, schema: LikeSchema },
     ]),
   ],
   controllers: [BlogsController, PostController, CommentController],
@@ -50,6 +55,7 @@ const commandHandlers = [
     QueryPostRepository,
     CommentRepository,
     CommentQueryRepository,
+    LikeCommentRepository,
     ...commandHandlers,
     ...queryHandlers,
   ],

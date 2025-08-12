@@ -2,7 +2,10 @@ import { QueryHandler } from '@nestjs/cqrs';
 import { CommentQueryRepository } from '../../infrastructure/query/comment.query.repository';
 
 export class GetCommentQuery {
-  constructor(public commentId: string) {}
+  constructor(
+    public commentId: string,
+    public userId: string,
+  ) {}
 }
 
 @QueryHandler(GetCommentQuery)
@@ -10,6 +13,6 @@ export class GetCommentHandler {
   constructor(private queryRepo: CommentQueryRepository) {}
 
   async execute(query: GetCommentQuery) {
-    return this.queryRepo.getCommentById(query.commentId);
+    return this.queryRepo.getCommentById(query.commentId, query.userId);
   }
 }

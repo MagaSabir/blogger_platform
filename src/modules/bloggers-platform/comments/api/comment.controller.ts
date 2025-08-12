@@ -19,6 +19,7 @@ import { UpdateCommentCommand } from '../application/usecases/update-comment.use
 import { DeleteCommentCommand } from '../application/usecases/delete-comment.usecase';
 import { GetCommentQuery } from '../application/queries/get-comment.query';
 import { SetLikeCommand } from '../application/usecases/set-like.usecase';
+import { JwtOptionalAuthGuard } from '../../../users/guards/bearer/Jwt-optional-auth.guard';
 
 @Controller('comments')
 export class CommentController {
@@ -62,9 +63,15 @@ export class CommentController {
   }
 
   @Get(':id')
-  async getCommentById(@Param('id', ObjectIdValidationPipe) id: string) {
+  @UseGuards(JwtOptionalAuthGuard)
+  async getCommentById(
+    @Param('id', ObjectIdValidationPipe) id: string,
+    @Req() req: { user: { id: string } },
+  ) {
+    const userId = req.user?.id ?? null;
+
     return this.queryBys.execute<GetCommentQuery, object>(
-      new GetCommentQuery(id),
+      new GetCommentQuery(id, userId),
     );
   }
 }

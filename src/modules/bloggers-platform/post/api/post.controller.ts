@@ -88,7 +88,7 @@ export class PostController {
       string
     >(new CommentCreateCommand(dto));
     return await this.queryBus.execute<GetCommentQuery, object>(
-      new GetCommentQuery(commentId),
+      new GetCommentQuery(commentId, dto.user.userId),
     );
   }
 

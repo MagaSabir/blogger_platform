@@ -19,7 +19,6 @@ export class SetLikeUseCase implements ICommandHandler<SetLikeCommand> {
     const { commentId, userId, likeStatus } = command;
     const existing: LikeCommentDocument | null =
       await this.likeRepo.findByCommentAndUser(commentId, userId);
-
     if (existing) {
       if (existing.likeStatus !== likeStatus) {
         existing.likeStatus = likeStatus;
@@ -29,5 +28,7 @@ export class SetLikeUseCase implements ICommandHandler<SetLikeCommand> {
     } else {
       await this.likeRepo.createLike(command);
     }
+
+    await this.likeRepo.updateLikesCount(commentId);
   }
 }

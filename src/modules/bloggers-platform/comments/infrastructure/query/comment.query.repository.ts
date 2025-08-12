@@ -7,19 +7,29 @@ import {
 import { CommentViewDto } from '../../application/queries/view-dto/comment.view-dto';
 import { NotFoundException } from '@nestjs/common';
 import { CommentQueryParams } from '../../api/input-dto/CommentQueryParams';
+import {
+  LikeComment,
+  LikeCommentDocument,
+  LikeCommentType,
+} from '../../../likes/domain/like-comment.domain';
 
 export class CommentQueryRepository {
   constructor(
     @InjectModel(Comments.name) private CommentModel: CommentModelType,
+    @InjectModel(LikeComment.name) private LikeModel: LikeCommentType,
   ) {}
-  async getCommentById(commentId: string) {
+  async getCommentById(commentId: string, userId: string) {
     const comment: CommentDocument | null = await this.CommentModel.findOne({
       _id: commentId,
       deletedAt: null,
     });
 
     if (!comment) return null;
-    return CommentViewDto.mapToView(comment);
+    const likes: LikeCommentDocument | null = await this.LikeModel.findOne({
+      commentId,
+      userId,
+    });
+    return CommentViewDto.mapToView(comment, likes);
   }
 
   async findCommentOrThrowNotFound(

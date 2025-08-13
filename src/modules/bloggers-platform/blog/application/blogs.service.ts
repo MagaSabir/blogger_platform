@@ -18,6 +18,7 @@ export class BlogsService {
 
   async updateBlog(id: string, dto: UpdateBlogDto): Promise<void> {
     const blog: BlogDocument | null = await this.blogRepo.findBlogById(id);
+    console.log(blog);
     if (!blog) throw new NotFoundException('Not Found');
     blog.updateBlog(dto);
     await this.blogRepo.save(blog);

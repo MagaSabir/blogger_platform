@@ -4,4 +4,6 @@ export enum DomainExceptionCodes {
   Unauthorized = 'Unauthorized',
   ConfirmationCodeExpired = 'ConfirmationCodeExpired',
   PasswordRecoveryCodeExpired = 'PasswordRecoveryCodeExpired',
+  ValidationError = 'ValidationError',
+  Forbidden = 'Forbidden',
 }

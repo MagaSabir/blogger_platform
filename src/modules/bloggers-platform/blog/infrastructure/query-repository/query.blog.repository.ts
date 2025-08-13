@@ -33,7 +33,6 @@ export class QueryBlogRepository {
     const items: BlogViewDto[] = blogs.map(
       (blog: BlogDocument): BlogViewDto => BlogViewDto.mapToView(blog),
     );
-    console.log(query.pageNumber);
 
     return {
       pagesCount: Math.ceil(totalCount / limit),

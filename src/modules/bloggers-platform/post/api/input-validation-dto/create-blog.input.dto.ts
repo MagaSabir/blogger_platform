@@ -1,18 +1,19 @@
-import { IsNotEmpty, IsString, Length } from 'class-validator';
+import { IsString, Length } from 'class-validator';
+import { Trim } from '../../../../../core/decorators/trim';
 
 export class CreateInputBlogDto {
   @IsString()
+  @Trim()
   @Length(1, 30)
-  @IsNotEmpty()
   title: string;
 
   @IsString()
-  @IsNotEmpty()
+  @Trim()
   @Length(1, 100)
   shortDescription: string;
 
   @IsString()
-  @IsNotEmpty()
+  @Trim()
   @Length(1, 1000)
   content: string;
 

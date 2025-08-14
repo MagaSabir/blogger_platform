@@ -13,7 +13,7 @@ import {
 import { JwtAuthGuard } from '../../../users/guards/bearer/jwt-auth.guard';
 import { LikeStatusInputDto } from './input-dto/like-status.input-dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
-import { CommentCommentDto } from './input-dto/comment-comment.dto';
+import { CommentInputDto } from './input-dto/comment-input.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UpdateCommentCommand } from '../application/usecases/update-comment.usecase';
 import { DeleteCommentCommand } from '../application/usecases/delete-comment.usecase';
@@ -43,7 +43,7 @@ export class CommentController {
   @Put(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateComment(
-    @Body() body: CommentCommentDto,
+    @Body() body: CommentInputDto,
     @Param('id', ObjectIdValidationPipe) id: string,
     @Req() req: { userId: { id: string } },
   ) {

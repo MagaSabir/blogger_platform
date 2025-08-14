@@ -18,5 +18,6 @@ export class CreateInputBlogDto {
   content: string;
 
   @IsString()
+  @Trim()
   blogId: string;
 }

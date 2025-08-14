@@ -1,5 +1,5 @@
 import { CommentDocument } from '../../../domain/comment.domain';
-import { LikeCommentDocument } from '../../../../likes/domain/like-comment.domain';
+import { LikeCommentDocument } from '../../../../likes/comments/domain/like-comment.domain';
 
 export class CommentViewDto {
   id: string;

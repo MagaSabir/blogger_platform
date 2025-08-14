@@ -22,8 +22,11 @@ import { UsersModule } from '../users/users.module';
 import { UpdateCommentUseCase } from './comments/application/usecases/update-comment.usecase';
 import { GetAllCommentByIdHandler } from './comments/application/queries/get-all-comments-by-id.query';
 import { DeleteCommentUseCase } from './comments/application/usecases/delete-comment.usecase';
-import { LikeCommentRepository } from './likes/infrastructure/like-comment.repository';
-import { LikeComment, LikeSchema } from './likes/domain/like-comment.domain';
+import { LikeCommentRepository } from './likes/comments/infrastructure/like-comment.repository';
+import {
+  LikeComment,
+  LikeSchema,
+} from './likes/comments/domain/like-comment.domain';
 import { SetLikeUseCase } from './comments/application/usecases/set-like.usecase';
 
 const queryHandlers = [GetAllCommentByIdHandler, GetCommentHandler];

@@ -24,11 +24,13 @@ import { GetUserByIdQuery } from '../../../users/application/queries/get-user-by
 import { UserViewDto } from '../../../users/application/queries/view-dto/user.view-dto';
 import { GetCommentQuery } from '../../comments/application/queries/get-comment.query';
 import { CreateInputBlogDto } from './input-validation-dto/create-blog.input.dto';
-import { CommentCommentDto } from '../../comments/api/input-dto/comment-comment.dto';
+import { CommentInputDto } from '../../comments/api/input-dto/comment-input.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
 import { CommentQueryParams } from '../../comments/api/input-dto/CommentQueryParams';
 import { GetAllCommentsByIdQuery } from '../../comments/application/queries/get-all-comments-by-id.query';
 import { CommentQueryRepository } from '../../comments/infrastructure/query/comment.query.repository';
+import { BasicAuthGuard } from '../../../users/guards/basic/basic-auth.guard';
+import { LikeStatusInputDto } from '../../comments/api/input-dto/like-status.input-dto';
 
 @Controller('posts')
 export class PostController {
@@ -56,6 +58,7 @@ export class PostController {
   }
 
   @Put(':id')
+  @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(@Param('id') id: string, @Body() dto: CreatedPostDto) {
     return await this.postService.updatePost(id, dto);
@@ -70,7 +73,7 @@ export class PostController {
   @Post(':id/comments')
   @UseGuards(JwtAuthGuard)
   async createComment(
-    @Body() body: CommentCommentDto,
+    @Body() body: CommentInputDto,
     @Param('id', ObjectIdValidationPipe) postId: string,
     @Req() req: { user: { id: string } },
   ) {
@@ -100,9 +103,16 @@ export class PostController {
     @Query() query: CommentQueryParams,
   ) {
     const userId = req.user?.id ?? null;
-    console.log(userId);
     return await this.queryBus.execute<GetAllCommentsByIdQuery, object>(
       new GetAllCommentsByIdQuery(postId, userId, query),
     );
   }
+
+  @Post(':id/like-status')
+  @UseGuards(JwtAuthGuard)
+  async likePost(
+    @Body() status: LikeStatusInputDto,
+    @Param('id', ObjectIdValidationPipe) id: string,
+    @Req() req: { user: { id: string } },
+  ) {}
 }

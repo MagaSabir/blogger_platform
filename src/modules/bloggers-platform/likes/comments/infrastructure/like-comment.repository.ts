@@ -8,7 +8,7 @@ import { CreateLikeDto } from '../dto/set-like.dto';
 import {
   CommentModelType,
   Comments,
-} from '../../comments/domain/comment.domain';
+} from '../../../comments/domain/comment.domain';
 
 export class LikeCommentRepository {
   constructor(

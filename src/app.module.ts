@@ -6,6 +6,8 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from './modules/testing/testing.module';
 import { UsersModule } from './modules/users/users.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { APP_FILTER } from '@nestjs/core';
+import { DomainHttpExceptionsFilter } from './core/exceptions/filters/error-exception-filter';
 
 @Module({
   imports: [
@@ -16,6 +18,9 @@ import { NotificationModule } from './modules/notification/notification.module';
     NotificationModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    { provide: APP_FILTER, useClass: DomainHttpExceptionsFilter },
+  ],
 })
 export class AppModule {}

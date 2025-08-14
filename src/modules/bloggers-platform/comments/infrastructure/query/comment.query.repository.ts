@@ -11,7 +11,7 @@ import {
   LikeComment,
   LikeCommentDocument,
   LikeCommentType,
-} from '../../../likes/domain/like-comment.domain';
+} from '../../../likes/comments/domain/like-comment.domain';
 
 export class CommentQueryRepository {
   constructor(

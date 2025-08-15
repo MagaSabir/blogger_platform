@@ -1,24 +1,30 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModelType } from '../../domain/post.entity';
 import { NotFoundException } from '@nestjs/common';
-import { PostViewDto } from '../../api/post.view-dto';
+import { PostViewDto } from '../../application/quries/view-dto/post.view-dto';
 import { QueryBlogRepository } from '../../../blog/infrastructure/query-repository/query.blog.repository';
 import { PostsQueryParams } from '../../api/input-validation-dto/PostsQueryParams';
 import { BasePaginatedResponse } from '../../../../../core/base-paginated-response';
+import { LikePostRepository } from '../../../likes/posts/infrastructure/like-post.repository';
+import { LikePostDocument } from '../../../likes/posts/domain/like-post.domain';
 
 export class QueryPostRepository {
   constructor(
     @InjectModel(Post.name) private PostModel: PostModelType,
     private blogQueryRepo: QueryBlogRepository,
+    private likePostRepo: LikePostRepository,
   ) {}
-  async getPostById(id: string): Promise<PostViewDto> {
+  async getPostById(id: string, userId: string): Promise<PostViewDto> {
     const post: PostDocument | null = await this.PostModel.findOne({
       _id: id,
       deletedAt: null,
     }).lean();
     if (!post) throw new NotFoundException('Not Found');
 
-    return PostViewDto.mapToView(post);
+    const likes: LikePostDocument | null =
+      await this.likePostRepo.findLikeByPostIdAndUser(id, userId);
+
+    return PostViewDto.mapToView(post, likes);
   }
 
   async getPosts(query: PostsQueryParams) {
@@ -37,8 +43,11 @@ export class QueryPostRepository {
       this.PostModel.countDocuments(filter),
     ]);
 
+    // const likes: LikePostDocument | null =
+    //   await this.likePostRepo.findLikeByPostIdAndUser();
+
     const items = posts.map((post: PostDocument) =>
-      PostViewDto.mapToView(post),
+      PostViewDto.mapToView(post, likes),
     );
 
     return {

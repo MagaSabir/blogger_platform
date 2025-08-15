@@ -18,7 +18,7 @@ import { BlogsQueryParams } from './input-validation-dto/blogs-query-params';
 import { QueryPostRepository } from '../../post/infrastructure/query-repository/query.post.repository';
 import { PostsQueryParams } from '../../post/api/input-validation-dto/PostsQueryParams';
 import { BasePaginatedResponse } from '../../../../core/base-paginated-response';
-import { PostViewDto } from '../../post/api/post.view-dto';
+import { PostViewDto } from '../../post/application/quries/view-dto/post.view-dto';
 import { PostService } from '../../post/application/service/post.service';
 import { CreatedPostDto } from '../../post/dto/created-post.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';

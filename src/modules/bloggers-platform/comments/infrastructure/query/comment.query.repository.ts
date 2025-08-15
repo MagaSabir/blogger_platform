@@ -20,9 +20,11 @@ export class CommentQueryRepository {
   ) {}
   async getCommentById(commentId: string, userId: string) {
     const comment: CommentDocument | null = await this.CommentModel.findOne({
-      _id: commentId,
+      commentId,
       deletedAt: null,
     });
+
+    console.log(comment);
 
     if (!comment) return null;
     const likes: LikeCommentDocument | null = await this.LikeModel.findOne({
@@ -64,10 +66,15 @@ export class CommentQueryRepository {
       .sort({ [queries.sortBy]: queries.sortDirection })
       .lean();
 
-    // const commentId = comments.map((l) => l._id);
-    // const likes = await LikesModel.find({commentId: {$in: commentId}, userId}).lean()
-    const comment = comments.map((el: CommentDocument) => {
-      // const matchedLikes = likes.find(l => l.commentId === el._id.toString())
+    const commentIds = comments.map((l) => l._id.toString()); // сразу в строки
+    const likes = await this.LikeModel.find({
+      commentId: { $in: commentIds },
+      userId,
+    }).lean();
+
+    const comment = comments.map((el) => {
+      const matchedLikes = likes.find((l) => l.commentId === el._id.toString());
+      console.log(matchedLikes);
       return {
         id: el._id.toString(),
         content: el.content,
@@ -79,7 +86,7 @@ export class CommentQueryRepository {
         likesInfo: {
           likesCount: el.likesCount,
           dislikesCount: el.dislikesCount,
-          myStatus: 'None',
+          myStatus: matchedLikes ? matchedLikes.likeStatus : 'None',
         },
       };
     });

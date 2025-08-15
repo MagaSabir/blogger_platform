@@ -1,5 +1,5 @@
 import { IsEnum } from 'class-validator';
-import { LikeStatus } from '../../../likes/comments/dto/set-like.dto';
+import { LikeStatus } from '../../../likes/dto/like-status.enum';
 
 export class LikeStatusInputDto {
   @IsEnum(LikeStatus)

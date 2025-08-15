@@ -18,8 +18,8 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UpdateCommentCommand } from '../application/usecases/update-comment.usecase';
 import { DeleteCommentCommand } from '../application/usecases/delete-comment.usecase';
 import { GetCommentQuery } from '../application/queries/get-comment.query';
-import { SetLikeCommand } from '../application/usecases/set-like.usecase';
 import { JwtOptionalAuthGuard } from '../../../users/guards/bearer/Jwt-optional-auth.guard';
+import { SetLikeCommand } from '../application/usecases/set-like.usecase';
 
 @Controller('comments')
 export class CommentController {

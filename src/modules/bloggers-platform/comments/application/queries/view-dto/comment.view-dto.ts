@@ -1,5 +1,6 @@
 import { CommentDocument } from '../../../domain/comment.domain';
 import { LikeCommentDocument } from '../../../../likes/comments/domain/like-comment.domain';
+import { LikeStatus } from '../../../../likes/dto/like-status.enum';
 
 export class CommentViewDto {
   id: string;
@@ -30,7 +31,7 @@ export class CommentViewDto {
     dto.likesInfo = {
       likesCount: comment.likesCount,
       dislikesCount: comment.dislikesCount,
-      myStatus: likes ? likes.likeStatus : 'None',
+      myStatus: likes ? likes.likeStatus : LikeStatus.None,
     };
     return dto;
   }

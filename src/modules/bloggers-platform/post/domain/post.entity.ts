@@ -22,6 +22,12 @@ export class Post {
   @Prop({ type: Date, required: true, default: Date.now })
   createdAt: Date;
 
+  @Prop({ type: Number, required: true, default: 0 })
+  likesCount: number;
+
+  @Prop({ type: Number, required: true, default: 0 })
+  dislikesCount: number;
+
   @Prop({ type: Date, default: null })
   deletedAt: Date | null;
 

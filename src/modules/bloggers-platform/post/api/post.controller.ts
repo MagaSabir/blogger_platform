@@ -15,7 +15,7 @@ import {
 import { CreatedPostDto } from '../dto/created-post.dto';
 import { PostService } from '../application/service/post.service';
 import { QueryPostRepository } from '../infrastructure/query-repository/query.post.repository';
-import { PostViewDto } from './post.view-dto';
+import { PostViewDto } from '../application/quries/view-dto/post.view-dto';
 import { PostsQueryParams } from './input-validation-dto/PostsQueryParams';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CommentCreateCommand } from '../../comments/application/usecases/comment-create.usecase';
@@ -42,14 +42,21 @@ export class PostController {
     private queryComment: CommentQueryRepository,
   ) {}
   @Post()
-  async createPost(@Body() dto: CreateInputBlogDto): Promise<PostViewDto> {
+  async createPost(
+    @Body() dto: CreateInputBlogDto,
+    @Req() req: { user: { id: string } },
+  ): Promise<PostViewDto> {
     const postId: string = await this.postService.createPost(dto);
-    return await this.postQueryRepo.getPostById(postId);
+
+    return await this.postQueryRepo.getPostById(postId, req.user.id);
   }
 
   @Get(':id')
-  async getPostById(@Param('id') id: string) {
-    return await this.postQueryRepo.getPostById(id);
+  async getPostById(
+    @Param('id') id: string,
+    @Req() req: { user: { id: string } },
+  ) {
+    return await this.postQueryRepo.getPostById(id, req.user.id);
   }
 
   @Get()
@@ -108,7 +115,7 @@ export class PostController {
     );
   }
 
-  @Post(':id/like-status')
+  @Put(':id/like-status')
   @UseGuards(JwtAuthGuard)
   async likePost(
     @Body() status: LikeStatusInputDto,

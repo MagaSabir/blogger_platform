@@ -6,28 +6,41 @@ import { QueryBlogRepository } from '../../../blog/infrastructure/query-reposito
 import { PostsQueryParams } from '../../api/input-validation-dto/PostsQueryParams';
 import { BasePaginatedResponse } from '../../../../../core/base-paginated-response';
 import { LikePostRepository } from '../../../likes/posts/infrastructure/like-post.repository';
-import { LikePostDocument } from '../../../likes/posts/domain/like-post.domain';
+import {
+  LikePost,
+  LikePostModelType,
+} from '../../../likes/posts/domain/like-post.domain';
 
 export class QueryPostRepository {
   constructor(
     @InjectModel(Post.name) private PostModel: PostModelType,
+    @InjectModel(LikePost.name) private LikePostModel: LikePostModelType,
     private blogQueryRepo: QueryBlogRepository,
     private likePostRepo: LikePostRepository,
   ) {}
-  async getPostById(id: string, userId: string): Promise<PostViewDto> {
-    const post: PostDocument | null = await this.PostModel.findOne({
+  async getPostById(id: string, userId?: string): Promise<PostDocument | null> {
+    return this.PostModel.findOne({
       _id: id,
       deletedAt: null,
     }).lean();
-    if (!post) throw new NotFoundException('Not Found');
-
-    const likes: LikePostDocument | null =
-      await this.likePostRepo.findLikeByPostIdAndUser(id, userId);
-
-    return PostViewDto.mapToView(post, likes);
   }
+  // if (!post) throw new NotFoundException('Not Found');
 
-  async getPosts(query: PostsQueryParams) {
+  //   const status = userId
+  //     ? await this.LikePostModel.findOne({ postId: id, userId }).lean()
+  //     : null;
+  //
+  //   const newestLikes = await this.LikePostModel.find({
+  //     postId: id,
+  //     likeStatus: 'Like',
+  //   })
+  //     .sort({ addedAt: -1 })
+  //     .limit(3)
+  //     .lean();
+  //   return PostViewDto.mapPostToView(post, status, newestLikes);
+  // }
+
+  async getPosts(query: PostsQueryParams, userId: string) {
     const filter = { deletedAt: null };
     const limit: number = query.pageSize;
 
@@ -43,19 +56,38 @@ export class QueryPostRepository {
       this.PostModel.countDocuments(filter),
     ]);
 
-    // const likes: LikePostDocument | null =
-    //   await this.likePostRepo.findLikeByPostIdAndUser();
-
-    const items = posts.map((post: PostDocument) =>
-      PostViewDto.mapToView(post, likes),
-    );
-
+    // const postIds = posts.map((post) => post._id);
+    // const userLikes = userId
+    //   ? await this.LikePostModel.find({
+    //       postId: { $in: postIds },
+    //       userId: userId,
+    //     }).lean()
+    //   : [];
+    //
+    // const newestLikes = await this.LikePostModel.find({
+    //   postId: { $in: postIds },
+    //   likeStatus: 'Like',
+    // })
+    //   .sort({ addedAt: -1 })
+    //   .limit(3)
+    //   .lean();
+    //
+    // const items = posts.map((post) => {
+    //   const likes = newestLikes.filter(
+    //     (l) => l.postId.toString() === post._id.toString(),
+    //   );
+    //
+    //   const likeStatus = userLikes.find(
+    //     (l) => l.postId.toString() === post._id.toString(),
+    //   );
+    //   return PostViewDto.mapToView(post, likeStatus, likes);
+    // });
     return {
-      pagesCount: Math.ceil(totalCount / limit),
-      page: query.pageNumber,
-      pageSize: query.pageSize,
+      // pagesCount: Math.ceil(totalCount / limit),
+      // page: query.pageNumber,
+      // pageSize: query.pageSize,
+      posts,
       totalCount,
-      items,
     };
   }
 
@@ -80,7 +112,7 @@ export class QueryPostRepository {
         .lean(),
       this.PostModel.countDocuments(filter),
     ]);
-    const items = posts.map((p) => PostViewDto.mapToView(p));
+    const items = [];
 
     return {
       pagesCount: Math.ceil(totalCount / limit),

@@ -9,6 +9,7 @@ import {
   Post,
   Put,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
@@ -85,8 +86,9 @@ export class BlogsController {
   async createPostByBlogId(
     @Body() dto: Omit<CreatedPostDto, 'blogId'>,
     @Param('id') id: string,
+    @Req() req: { user: { id: string } },
   ) {
     const postId: string = await this.postService.createdPostByBlogId(dto, id);
-    return this.postQueryRepo.getPostById(postId);
+    return this.postQueryRepo.getPostById(postId, req.user.id);
   }
 }

@@ -28,6 +28,12 @@ import {
   LikeSchema,
 } from './likes/comments/domain/like-comment.domain';
 import { SetLikeUseCase } from './comments/application/usecases/set-like.usecase';
+import {
+  LikePost,
+  LikePostSchema,
+} from './likes/posts/domain/like-post.domain';
+import { LikePostRepository } from './likes/posts/infrastructure/like-post.repository';
+import { LikePostUseCase } from './post/application/usecases/liike-post.usecase';
 
 const queryHandlers = [GetAllCommentByIdHandler, GetCommentHandler];
 const commandHandlers = [
@@ -35,6 +41,7 @@ const commandHandlers = [
   UpdateCommentUseCase,
   DeleteCommentUseCase,
   SetLikeUseCase,
+  LikePostUseCase,
 ];
 @Module({
   imports: [
@@ -46,6 +53,7 @@ const commandHandlers = [
       { name: Post.name, schema: PostSchema },
       { name: Comments.name, schema: CommentSchema },
       { name: LikeComment.name, schema: LikeSchema },
+      { name: LikePost.name, schema: LikePostSchema },
     ]),
   ],
   controllers: [BlogsController, PostController, CommentController],
@@ -59,6 +67,7 @@ const commandHandlers = [
     CommentRepository,
     CommentQueryRepository,
     LikeCommentRepository,
+    LikePostRepository,
     ...commandHandlers,
     ...queryHandlers,
   ],

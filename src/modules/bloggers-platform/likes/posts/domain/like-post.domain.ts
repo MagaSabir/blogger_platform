@@ -10,14 +10,11 @@ export class LikePost {
   @Prop({ type: String, required: true })
   userId: string;
 
-  @Prop({ type: String, required: true })
-  login: string;
-
   @Prop({ type: String, enum: LikeStatus, required: true })
   likeStatus: LikeStatus;
 
   @Prop({ type: Date, default: Date.now })
-  createdAt: Date;
+  addedAt: Date;
 }
 
 export const LikePostSchema = SchemaFactory.createForClass(LikePost);

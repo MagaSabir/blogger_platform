@@ -21,10 +21,26 @@ export class LikePostRepository {
   async createLike(dto: CreateLikePost) {
     await this.likePostModel.create(dto);
   }
+
+  async updateLikesCount(postId: string) {
+    const likes = await this.likePostModel.countDocuments({
+      postId,
+      likeStatus: 'Like',
+    });
+    const dislike = await this.likePostModel.countDocuments({
+      postId,
+      likeStatus: 'Dislike',
+    });
+
+    await this.likePostModel.updateOne(
+      { _id: postId },
+      { $set: { likesCount: likes, dislikesCount: dislike } },
+    );
+  }
 }
 
 export class CreateLikePost {
   postId: string;
   userId: string;
-  status: string;
+  likeStatus: string;
 }

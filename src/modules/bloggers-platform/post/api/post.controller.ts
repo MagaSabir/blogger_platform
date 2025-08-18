@@ -31,6 +31,8 @@ import { GetAllCommentsByIdQuery } from '../../comments/application/queries/get-
 import { CommentQueryRepository } from '../../comments/infrastructure/query/comment.query.repository';
 import { BasicAuthGuard } from '../../../users/guards/basic/basic-auth.guard';
 import { LikeStatusInputDto } from '../../comments/api/input-dto/like-status.input-dto';
+import { JwtOptionalAuthGuard } from '../../../users/guards/bearer/Jwt-optional-auth.guard';
+import { LikePostCommand } from '../application/usecases/liike-post.usecase';
 
 @Controller('posts')
 export class PostController {
@@ -42,13 +44,10 @@ export class PostController {
     private queryComment: CommentQueryRepository,
   ) {}
   @Post()
-  async createPost(
-    @Body() dto: CreateInputBlogDto,
-    @Req() req: { user: { id: string } },
-  ): Promise<PostViewDto> {
+  @UseGuards(BasicAuthGuard)
+  async createPost(@Body() dto: CreateInputBlogDto) {
     const postId: string = await this.postService.createPost(dto);
-
-    return await this.postQueryRepo.getPostById(postId, req.user.id);
+    return await this.postQueryRepo.getPostById(postId);
   }
 
   @Get(':id')
@@ -56,12 +55,20 @@ export class PostController {
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
   ) {
-    return await this.postQueryRepo.getPostById(id, req.user.id);
+    const userId = req.user?.id ?? null;
+
+    return await this.postQueryRepo.getPostById(id, userId);
   }
 
   @Get()
-  async getPosts(@Query() query: PostsQueryParams) {
-    return await this.postQueryRepo.getPosts(query);
+  @UseGuards(JwtOptionalAuthGuard)
+  async getPosts(
+    @Query() query: PostsQueryParams,
+    @Req() req: { user: { id: string } },
+  ) {
+    const userId = req.user?.id ?? null;
+
+    return await this.postQueryRepo.getPosts(query, userId);
   }
 
   @Put(':id')
@@ -121,5 +128,9 @@ export class PostController {
     @Body() status: LikeStatusInputDto,
     @Param('id', ObjectIdValidationPipe) id: string,
     @Req() req: { user: { id: string } },
-  ) {}
+  ) {
+    await this.commandBus.execute(
+      new LikePostCommand(id, req.user.id, status.likeStatus),
+    );
+  }
 }

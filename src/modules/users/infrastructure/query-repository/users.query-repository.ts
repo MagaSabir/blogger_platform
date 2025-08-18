@@ -51,4 +51,8 @@ export class UsersQueryRepository {
     if (!user) throw new NotFoundException('User not found');
     return UserViewDto.mapToView(user);
   }
+
+  async getUsersByIds(userIds: string[]) {
+    return this.userModel.find({ _id: { $in: userIds } }, { login: 1 }).lean();
+  }
 }

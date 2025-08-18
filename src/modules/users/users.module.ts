@@ -78,6 +78,6 @@ const queryHandler = [GetAllUsersQueryHandler, GetUserByIdHandler];
     ...refreshTokenConnectionProvider,
     ...queryHandler,
   ],
-  exports: [JwtStrategy],
+  exports: [JwtStrategy, UsersQueryRepository],
 })
 export class UsersModule {}

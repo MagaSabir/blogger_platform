@@ -33,6 +33,7 @@ import { BasicAuthGuard } from '../../../users/guards/basic/basic-auth.guard';
 import { LikeStatusInputDto } from '../../comments/api/input-dto/like-status.input-dto';
 import { JwtOptionalAuthGuard } from '../../../users/guards/bearer/Jwt-optional-auth.guard';
 import { LikePostCommand } from '../application/usecases/liike-post.usecase';
+import { GetPostQuery } from '../application/quries/get-post.query';
 
 @Controller('posts')
 export class PostController {
@@ -47,17 +48,22 @@ export class PostController {
   @UseGuards(BasicAuthGuard)
   async createPost(@Body() dto: CreateInputBlogDto) {
     const postId: string = await this.postService.createPost(dto);
-    return await this.postQueryRepo.getPostById(postId);
+    return await this.queryBus.execute<GetPostQuery, object>(
+      new GetPostQuery(postId),
+    );
   }
 
   @Get(':id')
+  @UseGuards(JwtOptionalAuthGuard)
   async getPostById(
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
   ) {
     const userId = req.user?.id ?? null;
 
-    return await this.postQueryRepo.getPostById(id, userId);
+    return await this.queryBus.execute<GetPostQuery, object>(
+      new GetPostQuery(id, userId),
+    );
   }
 
   @Get()

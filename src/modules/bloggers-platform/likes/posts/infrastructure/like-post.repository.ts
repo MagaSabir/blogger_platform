@@ -37,6 +37,14 @@ export class LikePostRepository {
       { $set: { likesCount: likes, dislikesCount: dislike } },
     );
   }
+
+  async findNewest(postId: string) {
+    return this.likePostModel
+      .find({ postId, likeStatus: 'Like' })
+      .sort({ addedAt: -1 })
+      .limit(3)
+      .lean();
+  }
 }
 
 export class CreateLikePost {

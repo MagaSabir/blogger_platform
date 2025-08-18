@@ -17,14 +17,14 @@ export class PostViewDto {
     newestLikes: {
       addedAt: Date;
       userId: string;
-      login: string;
+      login: string | undefined;
     }[];
   };
 
   static mapToView(
     post: PostDocument,
-    likeStatus: LikePostDocument | undefined,
-    likes: LikePostDocument[],
+    likeStatus: LikePostDocument | null,
+    mappedLikes: { userId: string; login: string | undefined; addedAt: Date }[],
   ) {
     const dto = new PostViewDto();
     dto.id = post._id.toString();
@@ -38,11 +38,7 @@ export class PostViewDto {
       likesCount: post.likesCount,
       dislikesCount: post.dislikesCount,
       myStatus: likeStatus?.likeStatus ?? LikeStatus.None,
-      newestLikes: likes.map((l) => ({
-        addedAt: l.addedAt,
-        userId: l.userId,
-        login: l.login,
-      })),
+      newestLikes: mappedLikes,
     };
 
     return dto;
@@ -50,8 +46,8 @@ export class PostViewDto {
 
   static mapPostToView(
     post: PostDocument,
-    status: LikePostDocument | null,
-    newestLikes: LikePostDocument[],
+    likeStatus: LikePostDocument | null,
+    mappedLikes: { userId: string; login: string; addedAt: Date }[],
   ) {
     const dto = new PostViewDto();
     dto.id = post._id.toString();
@@ -64,12 +60,8 @@ export class PostViewDto {
     dto.extendedLikesInfo = {
       likesCount: post.likesCount,
       dislikesCount: post.dislikesCount,
-      myStatus: status?.likeStatus ?? LikeStatus.None,
-      newestLikes: newestLikes.map((l) => ({
-        addedAt: l.addedAt,
-        userId: l.userId,
-        login: l.login,
-      })),
+      myStatus: likeStatus?.likeStatus ?? LikeStatus.None,
+      newestLikes: mappedLikes,
     };
     return dto;
   }

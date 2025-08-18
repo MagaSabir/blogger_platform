@@ -34,8 +34,13 @@ import {
 } from './likes/posts/domain/like-post.domain';
 import { LikePostRepository } from './likes/posts/infrastructure/like-post.repository';
 import { LikePostUseCase } from './post/application/usecases/liike-post.usecase';
+import { GetPostQueryHandler } from './post/application/quries/get-post.query';
 
-const queryHandlers = [GetAllCommentByIdHandler, GetCommentHandler];
+const queryHandlers = [
+  GetAllCommentByIdHandler,
+  GetCommentHandler,
+  GetPostQueryHandler,
+];
 const commandHandlers = [
   CommentCreateUseCase,
   UpdateCommentUseCase,

@@ -23,7 +23,7 @@ import { JwtAuthGuard } from '../../../users/guards/bearer/jwt-auth.guard';
 import { GetUserByIdQuery } from '../../../users/application/queries/get-user-byId.query';
 import { UserViewDto } from '../../../users/application/queries/view-dto/user.view-dto';
 import { GetCommentQuery } from '../../comments/application/queries/get-comment.query';
-import { CreateInputBlogDto } from './input-validation-dto/create-blog.input.dto';
+import { CreateInputPostDto } from './input-validation-dto/create-blog.input.dto';
 import { CommentInputDto } from '../../comments/api/input-dto/comment-input.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
 import { CommentQueryParams } from '../../comments/api/input-dto/CommentQueryParams';
@@ -47,7 +47,7 @@ export class PostController {
   ) {}
   @Post()
   @UseGuards(BasicAuthGuard)
-  async createPost(@Body() dto: CreateInputBlogDto) {
+  async createPost(@Body() dto: CreateInputPostDto) {
     const postId: string = await this.postService.createPost(dto);
     return await this.queryBus.execute<GetPostQuery, object>(
       new GetPostQuery(postId),
@@ -82,7 +82,7 @@ export class PostController {
   @Put(':id')
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updatePost(@Param('id') id: string, @Body() dto: CreatedPostDto) {
+  async updatePost(@Param('id') id: string, @Body() dto: CreateInputPostDto) {
     return await this.postService.updatePost(id, dto);
   }
 
@@ -131,6 +131,7 @@ export class PostController {
   }
 
   @Put(':id/like-status')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
   async likePost(
     @Body() status: LikeStatusInputDto,

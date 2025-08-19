@@ -26,6 +26,10 @@ import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validat
 import { CreateBlogDto } from './input-validation-dto/create-blog.dto';
 import { UpdateBlogInputDto } from './input-validation-dto/update-blog.dto';
 import { BasicAuthGuard } from '../../../users/guards/basic/basic-auth.guard';
+import { QueryBus } from '@nestjs/cqrs';
+import { GetAllPostsQuery } from '../../post/application/quries/get-all-posts.query';
+import { GetPostQuery } from '../../post/application/quries/get-post.query';
+import { CreateInputPostDto } from '../../post/api/input-validation-dto/create-blog.input.dto';
 
 @Controller('blogs')
 export class BlogsController {
@@ -34,6 +38,7 @@ export class BlogsController {
     private postService: PostService,
     private blogQueryRepo: QueryBlogRepository,
     private postQueryRepo: QueryPostRepository,
+    private queryBus: QueryBus,
   ) {}
   @Get()
   async getBlogs(
@@ -77,18 +82,22 @@ export class BlogsController {
   async getPostByBlogId(
     @Param('id') id: string,
     @Query() query: PostsQueryParams,
+    @Req() req: { user: { id: string } },
   ): Promise<BasePaginatedResponse<PostViewDto>> {
-    return this.postQueryRepo.getAllPostsByBlogId(id, query);
+    const userId = req.user?.id ?? null;
+    return this.queryBus.execute(new GetAllPostsQuery(query, userId));
   }
 
   @Post(':id/posts')
   @UseGuards(BasicAuthGuard)
   async createPostByBlogId(
-    @Body() dto: Omit<CreatedPostDto, 'blogId'>,
+    @Body() dto: Omit<CreateInputPostDto, 'blogId'>,
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
   ) {
     const postId: string = await this.postService.createdPostByBlogId(dto, id);
-    return this.postQueryRepo.getPostById(postId, req.user.id);
+    return this.queryBus.execute<GetPostQuery, object>(
+      new GetPostQuery(postId, req.user.id),
+    );
   }
 }

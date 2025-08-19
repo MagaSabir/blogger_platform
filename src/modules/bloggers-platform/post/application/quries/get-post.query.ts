@@ -33,17 +33,20 @@ export class GetPostQueryHandler implements IQueryHandler<GetPostQuery> {
 
     const newestLikes: LikePostDocument[] =
       await this.postLikeRepo.findNewest(postId);
-    const postIds: string[] = newestLikes.map(
+
+    const userIds: string[] = newestLikes.map(
       (l: LikePostDocument): string => l.userId,
     );
     const users: UserDocument[] =
-      await this.userQueryRepo.getUsersByIds(postIds);
+      await this.userQueryRepo.getUsersByIds(userIds);
     const userMap = new Map(
       users.map((u: UserDocument): [string, string] => [
         u._id.toString(),
         u.login,
       ]),
     );
+
+    console.log(userMap);
 
     const mappedLikes = newestLikes.map((l) => ({
       userId: l.userId,
@@ -54,5 +57,3 @@ export class GetPostQueryHandler implements IQueryHandler<GetPostQuery> {
     return PostViewDto.mapToView(post, likeStatus, mappedLikes);
   }
 }
-
-//TODO fix likesCount and DislikesCount

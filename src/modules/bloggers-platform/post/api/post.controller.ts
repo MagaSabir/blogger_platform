@@ -34,6 +34,7 @@ import { LikeStatusInputDto } from '../../comments/api/input-dto/like-status.inp
 import { JwtOptionalAuthGuard } from '../../../users/guards/bearer/Jwt-optional-auth.guard';
 import { LikePostCommand } from '../application/usecases/liike-post.usecase';
 import { GetPostQuery } from '../application/quries/get-post.query';
+import { GetAllPostsQuery } from '../application/quries/get-all-posts.query';
 
 @Controller('posts')
 export class PostController {
@@ -60,7 +61,6 @@ export class PostController {
     @Req() req: { user: { id: string } },
   ) {
     const userId = req.user?.id ?? null;
-
     return await this.queryBus.execute<GetPostQuery, object>(
       new GetPostQuery(id, userId),
     );
@@ -74,7 +74,9 @@ export class PostController {
   ) {
     const userId = req.user?.id ?? null;
 
-    return await this.postQueryRepo.getPosts(query, userId);
+    return await this.queryBus.execute<GetAllPostsQuery, object>(
+      new GetAllPostsQuery(query, userId),
+    );
   }
 
   @Put(':id')

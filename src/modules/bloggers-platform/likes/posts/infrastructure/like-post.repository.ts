@@ -29,6 +29,23 @@ export class LikePostRepository {
       .limit(3)
       .lean();
   }
+
+  async findLikes(postIds: string[], userId?: string) {
+    return this.likePostModel
+      .find({
+        postId: { $in: postIds },
+        userId: userId,
+      })
+      .lean();
+  }
+
+  async findAllLikes(postIds: string[]) {
+    return this.likePostModel
+      .find({ postId: { $in: postIds }, likeStatus: 'Like' })
+      .sort({ addedAt: -1 })
+      .limit(3)
+      .lean();
+  }
 }
 
 export class CreateLikePost {

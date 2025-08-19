@@ -40,7 +40,10 @@ export class QueryPostRepository {
   //   return PostViewDto.mapPostToView(post, status, newestLikes);
   // }
 
-  async getPosts(query: PostsQueryParams, userId: string) {
+  async getPosts(
+    query: PostsQueryParams,
+    userId?: string,
+  ): Promise<PostDocument[]> {
     const filter = { deletedAt: null };
     const limit: number = query.pageSize;
 
@@ -82,13 +85,12 @@ export class QueryPostRepository {
     //   );
     //   return PostViewDto.mapToView(post, likeStatus, likes);
     // });
-    return {
-      // pagesCount: Math.ceil(totalCount / limit),
-      // page: query.pageNumber,
-      // pageSize: query.pageSize,
-      posts,
-      totalCount,
-    };
+    return posts;
+    // pagesCount: Math.ceil(totalCount / limit),
+    // page: query.pageNumber,
+    // pageSize: query.pageSize,
+
+    // totalCount,
   }
 
   async getAllPostsByBlogId(

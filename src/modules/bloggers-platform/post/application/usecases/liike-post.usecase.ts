@@ -40,6 +40,6 @@ export class LikePostUseCase implements ICommandHandler<LikePostCommand> {
       await this.postLikeRepo.createLike(command);
     }
 
-    await this.postLikeRepo.updateLikesCount(postId);
+    await this.postRepo.updateLikesCount(postId);
   }
 }

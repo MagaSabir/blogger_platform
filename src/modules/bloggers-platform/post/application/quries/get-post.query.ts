@@ -4,6 +4,8 @@ import { LikePostRepository } from '../../../likes/posts/infrastructure/like-pos
 import { NotFoundException } from '@nestjs/common';
 import { UsersQueryRepository } from '../../../../users/infrastructure/query-repository/users.query-repository';
 import { PostViewDto } from './view-dto/post.view-dto';
+import { LikePostDocument } from '../../../likes/posts/domain/like-post.domain';
+import { UserDocument } from '../../../../users/domain/users.domain';
 
 export class GetPostQuery {
   constructor(
@@ -20,7 +22,7 @@ export class GetPostQueryHandler implements IQueryHandler<GetPostQuery> {
     private userQueryRepo: UsersQueryRepository,
   ) {}
 
-  async execute(query: GetPostQuery) {
+  async execute(query: GetPostQuery): Promise<PostViewDto> {
     const { postId, userId } = query;
     const post = await this.postRepo.findPostById(postId);
     if (!post) throw new NotFoundException();
@@ -29,10 +31,19 @@ export class GetPostQueryHandler implements IQueryHandler<GetPostQuery> {
       ? await this.postLikeRepo.findLikeByPostIdAndUser(postId, userId)
       : null;
 
-    const newestLikes = await this.postLikeRepo.findNewest(postId);
-    const postIds = newestLikes.map((l) => l.userId);
-    const users = await this.userQueryRepo.getUsersByIds(postIds);
-    const userMap = new Map(users.map((u) => [u._id.toString(), u.login]));
+    const newestLikes: LikePostDocument[] =
+      await this.postLikeRepo.findNewest(postId);
+    const postIds: string[] = newestLikes.map(
+      (l: LikePostDocument): string => l.userId,
+    );
+    const users: UserDocument[] =
+      await this.userQueryRepo.getUsersByIds(postIds);
+    const userMap = new Map(
+      users.map((u: UserDocument): [string, string] => [
+        u._id.toString(),
+        u.login,
+      ]),
+    );
 
     const mappedLikes = newestLikes.map((l) => ({
       userId: l.userId,

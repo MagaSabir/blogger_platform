@@ -20,13 +20,10 @@ export class CommentQueryRepository {
   ) {}
   async getCommentById(commentId: string, userId: string) {
     const comment: CommentDocument | null = await this.CommentModel.findOne({
-      commentId,
+      _id: commentId,
       deletedAt: null,
     });
-
-    console.log(comment);
-
-    if (!comment) return null;
+    if (!comment) throw new NotFoundException();
     const likes: LikeCommentDocument | null = await this.LikeModel.findOne({
       commentId,
       userId,

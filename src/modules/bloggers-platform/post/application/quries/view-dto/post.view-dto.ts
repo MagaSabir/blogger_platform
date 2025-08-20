@@ -15,7 +15,7 @@ export class PostViewDto {
     dislikesCount: number;
     myStatus: LikeStatus;
     newestLikes: {
-      addedAt: Date;
+      addedAt: string;
       userId: string;
       login: string | undefined;
     }[];
@@ -24,7 +24,11 @@ export class PostViewDto {
   static mapToView(
     post: PostDocument,
     likeStatus: LikePostDocument | null | undefined,
-    mappedLikes: { userId: string; login: string | undefined; addedAt: Date }[],
+    mappedLikes: {
+      userId: string;
+      login: string | undefined;
+      addedAt: string;
+    }[],
   ) {
     const dto = new PostViewDto();
     dto.id = post._id.toString();

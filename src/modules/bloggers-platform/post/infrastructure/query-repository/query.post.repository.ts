@@ -1,10 +1,8 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument, PostModelType } from '../../domain/post.entity';
 import { NotFoundException } from '@nestjs/common';
-import { PostViewDto } from '../../application/quries/view-dto/post.view-dto';
 import { QueryBlogRepository } from '../../../blog/infrastructure/query-repository/query.blog.repository';
 import { PostsQueryParams } from '../../api/input-validation-dto/PostsQueryParams';
-import { BasePaginatedResponse } from '../../../../../core/base-paginated-response';
 import { LikePostRepository } from '../../../likes/posts/infrastructure/like-post.repository';
 import {
   LikePost,
@@ -94,7 +92,8 @@ export class QueryPostRepository {
   async getAllPostsByBlogId(
     id: string,
     query: PostsQueryParams,
-  ): Promise<BasePaginatedResponse<PostViewDto>> {
+    userId?: string,
+  ) {
     const blog = await this.blogQueryRepo.getBlog(id);
     if (!blog) throw new NotFoundException('Not Found');
     const filter = { blogId: id, deletedAt: null };
@@ -112,14 +111,13 @@ export class QueryPostRepository {
         .lean(),
       this.PostModel.countDocuments(filter),
     ]);
-    const items = [];
 
     return {
-      pagesCount: Math.ceil(totalCount / limit),
-      page: query.pageNumber,
-      pageSize: query.pageSize,
+      // pagesCount: Math.ceil(totalCount / limit),
+      // page: query.pageNumber,
+      // pageSize: query.pageSize,
+      posts,
       totalCount,
-      items,
     };
   }
 }

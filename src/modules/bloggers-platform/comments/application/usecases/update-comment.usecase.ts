@@ -1,7 +1,7 @@
 import { CommandHandler } from '@nestjs/cqrs';
 import { CommentQueryRepository } from '../../infrastructure/query/comment.query.repository';
 import { CommentDocument } from '../../domain/comment.domain';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 
 export class UpdateCommentCommand {
   constructor(
@@ -19,6 +19,7 @@ export class UpdateCommentUseCase {
     const comment: CommentDocument =
       await this.queryRepo.findCommentOrThrowNotFound(command.commentId);
 
+    if (!comment) throw new NotFoundException();
     if (comment.commentatorInfo.userId !== command.userId) {
       throw new ForbiddenException();
     }

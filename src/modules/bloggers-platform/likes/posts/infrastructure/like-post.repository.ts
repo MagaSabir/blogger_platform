@@ -43,7 +43,6 @@ export class LikePostRepository {
     return this.likePostModel
       .find({ postId: { $in: postIds }, likeStatus: 'Like' })
       .sort({ addedAt: -1 })
-      .limit(3)
       .lean();
   }
 }

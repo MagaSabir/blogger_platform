@@ -46,12 +46,10 @@ export class GetPostQueryHandler implements IQueryHandler<GetPostQuery> {
       ]),
     );
 
-    console.log(userMap);
-
     const mappedLikes = newestLikes.map((l) => ({
       userId: l.userId,
       login: userMap.get(l.userId.toString()),
-      addedAt: l.addedAt,
+      addedAt: l.addedAt.toISOString(),
     }));
 
     return PostViewDto.mapToView(post, likeStatus, mappedLikes);

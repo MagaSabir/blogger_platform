@@ -1,41 +1,41 @@
+import { PostsQueryParams } from '../../../post/api/input-validation-dto/PostsQueryParams';
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { PostsQueryParams } from '../../api/input-validation-dto/PostsQueryParams';
-import { QueryPostRepository } from '../../infrastructure/query-repository/query.post.repository';
+import { QueryPostRepository } from '../../../post/infrastructure/query-repository/query.post.repository';
 import { LikePostRepository } from '../../../likes/posts/infrastructure/like-post.repository';
 import { UsersQueryRepository } from '../../../../users/infrastructure/query-repository/users.query-repository';
-import { PostViewDto } from './view-dto/post.view-dto';
+import { PostViewDto } from '../../../post/application/quries/view-dto/post.view-dto';
 
-export class GetAllPostsQuery {
+export class GetPostByBlogIdQuery {
   constructor(
+    public blogId: string,
     public queryParam: PostsQueryParams,
     public userId: string,
   ) {}
 }
 
-@QueryHandler(GetAllPostsQuery)
-export class GetAllPostsQueryHandler
-  implements IQueryHandler<GetAllPostsQuery>
+@QueryHandler(GetPostByBlogIdQuery)
+export class GetPostByBlogIdQueryHandler
+  implements IQueryHandler<GetPostByBlogIdQuery>
 {
   constructor(
     private postQueryRepo: QueryPostRepository,
-    private postLikeRepo: LikePostRepository,
+    private postLikesRepo: LikePostRepository,
     private userQueryRepo: UsersQueryRepository,
   ) {}
 
-  async execute(query: GetAllPostsQuery) {
-    const { posts, totalCount } = await this.postQueryRepo.getPosts(
+  async execute(query: GetPostByBlogIdQuery) {
+    const { posts, totalCount } = await this.postQueryRepo.getAllPostsByBlogId(
+      query.blogId,
       query.queryParam,
       query.userId,
     );
-
-    const postIds: string[] = posts.map((post) => post._id.toString());
-
+    const postIds = posts.map((post) => post._id.toString());
     const userLikes = query.userId
-      ? await this.postLikeRepo.findLikes(postIds, query.userId)
+      ? await this.postLikesRepo.findLikes(postIds, query.userId)
       : [];
-    const allLikes = await this.postLikeRepo.findAllLikes(postIds);
+    const allLikes = await this.postLikesRepo.findAllLikes(postIds);
 
-    const allUsersIds: string[] = Array.from(
+    const allUsersIds = Array.from(
       new Set(allLikes.map((l) => l.userId.toString())),
     );
 
@@ -46,9 +46,9 @@ export class GetAllPostsQueryHandler
 
     const userMap = new Map(users.map((u) => [u._id.toString(), u.login]));
 
-    const items: PostViewDto[] = posts.map((post) => {
-      const postId: string = post._id.toString();
-      const postLikes = allLikes
+    const items = posts.map((post) => {
+      const postId = post._id.toString();
+      const newestLikes = allLikes
         .filter((l) => l.postId.toString() === postId)
         .slice(0, 3)
         .map((l) => ({
@@ -58,11 +58,11 @@ export class GetAllPostsQueryHandler
         }));
 
       const matchedLikes = userLikes.find(
-        (l) => l.postId.toString() === postId,
+        (u) => u.postId.toString() === post._id.toString(),
       );
-      return PostViewDto.mapToView(post, matchedLikes, postLikes);
-    });
 
+      return PostViewDto.mapToView(post, matchedLikes, newestLikes);
+    });
     return {
       pagesCount: Math.ceil(totalCount / query.queryParam.pageSize),
       page: query.queryParam.pageNumber,

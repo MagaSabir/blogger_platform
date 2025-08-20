@@ -21,15 +21,15 @@ import { PostsQueryParams } from '../../post/api/input-validation-dto/PostsQuery
 import { BasePaginatedResponse } from '../../../../core/base-paginated-response';
 import { PostViewDto } from '../../post/application/quries/view-dto/post.view-dto';
 import { PostService } from '../../post/application/service/post.service';
-import { CreatedPostDto } from '../../post/dto/created-post.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
 import { CreateBlogDto } from './input-validation-dto/create-blog.dto';
 import { UpdateBlogInputDto } from './input-validation-dto/update-blog.dto';
 import { BasicAuthGuard } from '../../../users/guards/basic/basic-auth.guard';
 import { QueryBus } from '@nestjs/cqrs';
-import { GetAllPostsQuery } from '../../post/application/quries/get-all-posts.query';
 import { GetPostQuery } from '../../post/application/quries/get-post.query';
-import { CreateInputPostDto } from '../../post/api/input-validation-dto/create-blog.input.dto';
+import { JwtOptionalAuthGuard } from '../../../users/guards/bearer/Jwt-optional-auth.guard';
+import { GetPostByBlogIdQuery } from '../application/quries/get-post-by-id.query';
+import { CreatePostByBlogId } from './input-validation-dto/create-post-by-blogId';
 
 @Controller('blogs')
 export class BlogsController {
@@ -79,19 +79,20 @@ export class BlogsController {
   }
 
   @Get(':id/posts')
+  @UseGuards(JwtOptionalAuthGuard)
   async getPostByBlogId(
     @Param('id') id: string,
     @Query() query: PostsQueryParams,
     @Req() req: { user: { id: string } },
   ): Promise<BasePaginatedResponse<PostViewDto>> {
     const userId = req.user?.id ?? null;
-    return this.queryBus.execute(new GetAllPostsQuery(query, userId));
+    return this.queryBus.execute(new GetPostByBlogIdQuery(id, query, userId));
   }
 
   @Post(':id/posts')
   @UseGuards(BasicAuthGuard)
   async createPostByBlogId(
-    @Body() dto: Omit<CreateInputPostDto, 'blogId'>,
+    @Body() dto: CreatePostByBlogId,
     @Param('id') id: string,
     @Req() req: { user: { id: string } },
   ) {

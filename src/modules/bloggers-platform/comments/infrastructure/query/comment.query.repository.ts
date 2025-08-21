@@ -12,11 +12,13 @@ import {
   LikeCommentDocument,
   LikeCommentType,
 } from '../../../likes/comments/domain/like-comment.domain';
+import { Post, PostModelType } from '../../../post/domain/post.entity';
 
 export class CommentQueryRepository {
   constructor(
     @InjectModel(Comments.name) private CommentModel: CommentModelType,
     @InjectModel(LikeComment.name) private LikeModel: LikeCommentType,
+    @InjectModel(Post.name) private PostModel: PostModelType,
   ) {}
   async getCommentById(commentId: string, userId: string) {
     const comment: CommentDocument | null = await this.CommentModel.findOne({
@@ -49,6 +51,8 @@ export class CommentQueryRepository {
     userId: string,
     queries: CommentQueryParams,
   ) {
+    // const post = await this.PostModel.findOne({ _id: postId });
+    // if (!post) throw new NotFoundException();
     const totalCountPosts: number = await this.CommentModel.countDocuments({
       postId: postId,
       deletedAt: null,
@@ -63,7 +67,8 @@ export class CommentQueryRepository {
       .sort({ [queries.sortBy]: queries.sortDirection })
       .lean();
 
-    const commentIds = comments.map((l) => l._id.toString()); // сразу в строки
+    if (comments.length === 0) throw new NotFoundException();
+    const commentIds = comments.map((l) => l._id.toString());
     const likes = await this.LikeModel.find({
       commentId: { $in: commentIds },
       userId,
@@ -71,7 +76,6 @@ export class CommentQueryRepository {
 
     const comment = comments.map((el) => {
       const matchedLikes = likes.find((l) => l.commentId === el._id.toString());
-      console.log(matchedLikes);
       return {
         id: el._id.toString(),
         content: el.content,

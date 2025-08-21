@@ -28,8 +28,8 @@ export class CommentController {
     private queryBys: QueryBus,
   ) {}
   @Put(':id/like-status')
-  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async likeStatus(
     @Body() status: LikeStatusInputDto,
     @Param('id', ObjectIdValidationPipe) id: string,
@@ -41,14 +41,15 @@ export class CommentController {
   }
 
   @Put(':id')
+  @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updateComment(
     @Body() body: CommentInputDto,
     @Param('id', ObjectIdValidationPipe) id: string,
-    @Req() req: { userId: { id: string } },
+    @Req() req: { user: { id: string } },
   ) {
     await this.commandBus.execute(
-      new UpdateCommentCommand(body.content, id, req.userId.id),
+      new UpdateCommentCommand(body.content, id, req.user.id),
     );
   }
 

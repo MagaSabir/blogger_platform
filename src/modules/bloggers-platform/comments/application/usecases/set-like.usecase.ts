@@ -17,8 +17,10 @@ export class SetLikeUseCase implements ICommandHandler<SetLikeCommand> {
 
   async execute(command: SetLikeCommand) {
     const { commentId, userId, likeStatus } = command;
+
     const existing: LikeCommentDocument | null =
       await this.likeRepo.findByCommentAndUser(commentId, userId);
+
     if (existing) {
       if (existing.likeStatus !== likeStatus) {
         existing.likeStatus = likeStatus;

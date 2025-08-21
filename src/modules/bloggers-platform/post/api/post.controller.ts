@@ -12,10 +12,8 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { CreatedPostDto } from '../dto/created-post.dto';
 import { PostService } from '../application/service/post.service';
 import { QueryPostRepository } from '../infrastructure/query-repository/query.post.repository';
-import { PostViewDto } from '../application/quries/view-dto/post.view-dto';
 import { PostsQueryParams } from './input-validation-dto/PostsQueryParams';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CommentCreateCommand } from '../../comments/application/usecases/comment-create.usecase';
@@ -119,7 +117,7 @@ export class PostController {
   }
 
   @Get(':id/comments')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtOptionalAuthGuard)
   async getCommentsByPostId(
     @Param('id', ObjectIdValidationPipe) postId: string,
     @Req() req: { user: { id: string } },

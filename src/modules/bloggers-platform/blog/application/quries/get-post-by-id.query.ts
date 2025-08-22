@@ -29,15 +29,15 @@ export class GetPostByBlogIdQueryHandler
       query.queryParam,
       query.userId,
     );
-    const postIds = posts.map((post) => post._id.toString());
+    const postIds: string[] = posts.map((post) => post._id.toString()); //get all post ids
     const userLikes = query.userId
       ? await this.postLikesRepo.findLikes(postIds, query.userId)
-      : [];
-    const allLikes = await this.postLikesRepo.findAllLikes(postIds);
+      : []; // if user authorized, get likes by userId and postIds in order to get like status
+    const allLikes = await this.postLikesRepo.findAllLikes(postIds); // get all likes by postIds order to get newestLikes
 
     const allUsersIds = Array.from(
       new Set(allLikes.map((l) => l.userId.toString())),
-    );
+    ); // getting unique user IDs order to get user logins by ids
 
     const users =
       allUsersIds.length > 0

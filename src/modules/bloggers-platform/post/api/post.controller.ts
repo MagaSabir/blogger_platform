@@ -13,7 +13,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PostService } from '../application/service/post.service';
-import { QueryPostRepository } from '../infrastructure/query-repository/query.post.repository';
 import { PostsQueryParams } from './input-validation-dto/PostsQueryParams';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CommentCreateCommand } from '../../comments/application/usecases/comment-create.usecase';
@@ -26,7 +25,6 @@ import { CommentInputDto } from '../../comments/api/input-dto/comment-input.dto'
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
 import { CommentQueryParams } from '../../comments/api/input-dto/CommentQueryParams';
 import { GetAllCommentsByIdQuery } from '../../comments/application/queries/get-all-comments-by-id.query';
-import { CommentQueryRepository } from '../../comments/infrastructure/query/comment.query.repository';
 import { BasicAuthGuard } from '../../../users/guards/basic/basic-auth.guard';
 import { LikeStatusInputDto } from '../../comments/api/input-dto/like-status.input-dto';
 import { JwtOptionalAuthGuard } from '../../../users/guards/bearer/Jwt-optional-auth.guard';
@@ -39,9 +37,7 @@ export class PostController {
   constructor(
     private commandBus: CommandBus,
     private queryBus: QueryBus,
-    private postQueryRepo: QueryPostRepository,
     private postService: PostService,
-    private queryComment: CommentQueryRepository,
   ) {}
   @Post()
   @UseGuards(BasicAuthGuard)

@@ -52,8 +52,4 @@ export class QueryBlogRepository {
     }
     return BlogViewDto.mapToView(blog);
   }
-
-  async getBlogsByIds(ids: Array<string>) {
-    return this.blogModel.find({ _id: { $in: ids }, deletedAt: null }).lean();
-  }
 }

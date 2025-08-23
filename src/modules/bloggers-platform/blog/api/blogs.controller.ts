@@ -30,6 +30,8 @@ import { JwtOptionalAuthGuard } from '../../../users/guards/bearer/Jwt-optional-
 import { GetPostByBlogIdQuery } from '../application/quries/get-post-by-id.query';
 import { CreatePostByBlogId } from './input-validation-dto/create-post-by-blogId';
 import { CreateBlogCommand } from '../application/usecases/create-blog-usecase';
+import { UpdateBlogCommand } from '../application/usecases/update-blog-usecase';
+import { DeleteBlogCommand } from '../application/usecases/delete-blog-usecase';
 
 @Controller('blogs')
 export class BlogsController {
@@ -70,14 +72,14 @@ export class BlogsController {
     @Param('id') id: string,
     @Body() body: UpdateBlogInputDto,
   ): Promise<void> {
-    await this.blogService.updateBlog(id, body);
+    await this.commandBus.execute(new UpdateBlogCommand(body, id));
   }
 
   @Delete(':id')
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id') id: string): Promise<void> {
-    await this.blogService.deleteBlog(id);
+    await this.commandBus.execute(new DeleteBlogCommand(id));
   }
 
   @Get(':id/posts')

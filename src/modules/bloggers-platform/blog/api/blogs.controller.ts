@@ -32,6 +32,7 @@ import { CreatePostByBlogId } from './input-validation-dto/create-post-by-blogId
 import { CreateBlogCommand } from '../application/usecases/create-blog-usecase';
 import { UpdateBlogCommand } from '../application/usecases/update-blog-usecase';
 import { DeleteBlogCommand } from '../application/usecases/delete-blog-usecase';
+import { GetBlogByIdQuery } from '../application/quries/get-blog-by-id.query';
 
 @Controller('blogs')
 export class BlogsController {
@@ -53,7 +54,7 @@ export class BlogsController {
   async getBlogById(
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<BlogViewDto> {
-    return await this.blogQueryRepo.getBlog(id);
+    return await this.queryBus.execute(new GetBlogByIdQuery(id));
   }
 
   @Post()

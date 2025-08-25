@@ -6,12 +6,21 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from './modules/testing/testing.module';
 import { UsersModule } from './modules/users/users.module';
 import { NotificationModule } from './modules/notification/notification.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/error-exception-filter';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
     MongooseModule.forRoot('mongodb://0.0.0.0:27017/blogPlatform'),
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 5,
+        },
+      ],
+    }),
     BloggersPlatformModule,
     TestingModule,
     UsersModule,
@@ -21,6 +30,10 @@ import { DomainHttpExceptionsFilter } from './core/exceptions/filters/error-exce
   providers: [
     AppService,
     { provide: APP_FILTER, useClass: DomainHttpExceptionsFilter },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

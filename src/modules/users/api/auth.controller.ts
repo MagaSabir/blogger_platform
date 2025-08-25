@@ -25,6 +25,7 @@ import { PasswordRecoveryCommand } from '../application/usecases/password-recove
 import { NewPasswordCommand } from '../application/usecases/new-password.usecase';
 import { ConfirmationCommand } from '../application/usecases/confirmation.usecase';
 import { RegistrationResendingCommand } from '../application/usecases/registration-resending.usecase';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -41,6 +42,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @UseGuards(ThrottlerGuard, LocalAuthGuard) // Добавьте ThrottlerGuard
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
   async login(@Req() req: { user: { id: string } }, @Res() res: Response) {

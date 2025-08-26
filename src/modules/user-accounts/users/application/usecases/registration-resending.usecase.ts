@@ -3,7 +3,7 @@ import { UsersRepository } from '../../infrastructure/users.repository';
 import { UserDocument } from '../../domain/users.domain';
 import { BadRequestException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
-import { EmailService } from '../../../notification/email.service';
+import { EmailService } from '../../../../notification/email.service';
 
 export class RegistrationResendingCommand {
   constructor(public email: string) {}

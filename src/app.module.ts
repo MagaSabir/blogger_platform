@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { BloggersPlatformModule } from './modules/bloggers-platform/bloggers-platform.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from './modules/testing/testing.module';
-import { UsersModule } from './modules/users/users.module';
+import { UsersModule } from './modules/user-accounts/users/users.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/error-exception-filter';

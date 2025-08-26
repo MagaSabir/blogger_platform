@@ -2,10 +2,10 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 import { LikePostRepository } from '../../../likes/posts/infrastructure/like-post.repository';
 import { NotFoundException } from '@nestjs/common';
-import { UsersQueryRepository } from '../../../../users/infrastructure/query-repository/users.query-repository';
+import { UsersQueryRepository } from '../../../../user-accounts/users/infrastructure/query-repository/users.query-repository';
 import { PostViewDto } from './view-dto/post.view-dto';
 import { LikePostDocument } from '../../../likes/posts/domain/like-post.domain';
-import { UserDocument } from '../../../../users/domain/users.domain';
+import { UserDocument } from '../../../../user-accounts/users/domain/users.domain';
 
 export class GetPostQuery {
   constructor(

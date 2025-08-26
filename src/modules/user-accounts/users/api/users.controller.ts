@@ -14,7 +14,7 @@ import { UsersQueryRepository } from '../infrastructure/query-repository/users.q
 import { UsersService } from '../application/service/users.service';
 import { UsersQueryParams } from './input-dto/users-query-params';
 import { CreateUserInputDto } from './input-dto/create-user.dto';
-import { ObjectIdValidationPipe } from '../../../core/pipes/object-id-validation.pipe';
+import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
 import { BasicAuthGuard } from '../guards/basic/basic-auth.guard';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../application/usecases/admins/create-user.usecase';

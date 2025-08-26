@@ -10,7 +10,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../../../users/guards/bearer/jwt-auth.guard';
+import { JwtAuthGuard } from '../../../user-accounts/users/guards/bearer/jwt-auth.guard';
 import { LikeStatusInputDto } from './input-dto/like-status.input-dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
 import { CommentInputDto } from './input-dto/comment-input.dto';
@@ -18,7 +18,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UpdateCommentCommand } from '../application/usecases/update-comment.usecase';
 import { DeleteCommentCommand } from '../application/usecases/delete-comment.usecase';
 import { GetCommentQuery } from '../application/queries/get-comment.query';
-import { JwtOptionalAuthGuard } from '../../../users/guards/bearer/Jwt-optional-auth.guard';
+import { JwtOptionalAuthGuard } from '../../../user-accounts/users/guards/bearer/Jwt-optional-auth.guard';
 import { SetLikeCommand } from '../application/usecases/set-like.usecase';
 
 @Controller('comments')

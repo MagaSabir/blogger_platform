@@ -4,7 +4,7 @@ import { BcryptService } from './bcrypt.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserModelType } from '../../domain/users.domain';
 import { JwtService } from '@nestjs/jwt';
-import { EmailService } from '../../../notification/email.service';
+import { EmailService } from '../../../../notification/email.service';
 
 @Injectable()
 export class AuthService {

@@ -1,5 +1,5 @@
 import { IsString, IsUUID, Length } from 'class-validator';
-import { Trim } from '../../../../core/decorators/trim';
+import { Trim } from '../../../../../core/decorators/trim';
 
 export class InputNewPasswordDto {
   @IsString()

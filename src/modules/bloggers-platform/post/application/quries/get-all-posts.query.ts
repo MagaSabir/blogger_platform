@@ -2,7 +2,7 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { PostsQueryParams } from '../../api/input-validation-dto/PostsQueryParams';
 import { QueryPostRepository } from '../../infrastructure/query-repository/query.post.repository';
 import { LikePostRepository } from '../../../likes/posts/infrastructure/like-post.repository';
-import { UsersQueryRepository } from '../../../../users/infrastructure/query-repository/users.query-repository';
+import { UsersQueryRepository } from '../../../../user-accounts/users/infrastructure/query-repository/users.query-repository';
 import { PostViewDto } from './view-dto/post.view-dto';
 
 export class GetAllPostsQuery {

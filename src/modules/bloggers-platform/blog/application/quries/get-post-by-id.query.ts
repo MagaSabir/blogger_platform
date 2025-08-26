@@ -2,7 +2,7 @@ import { PostsQueryParams } from '../../../post/api/input-validation-dto/PostsQu
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { QueryPostRepository } from '../../../post/infrastructure/query-repository/query.post.repository';
 import { LikePostRepository } from '../../../likes/posts/infrastructure/like-post.repository';
-import { UsersQueryRepository } from '../../../../users/infrastructure/query-repository/users.query-repository';
+import { UsersQueryRepository } from '../../../../user-accounts/users/infrastructure/query-repository/users.query-repository';
 import { PostViewDto } from '../../../post/application/quries/view-dto/post.view-dto';
 
 export class GetPostByBlogIdQuery {

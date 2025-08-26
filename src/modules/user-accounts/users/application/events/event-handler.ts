@@ -1,6 +1,6 @@
 import { EventsHandler, IEventHandler } from '@nestjs/cqrs';
 import { UserRegisteredEvent } from './user-registered.event';
-import { EmailService } from '../../../notification/email.service';
+import { EmailService } from '../../../../notification/email.service';
 
 @EventsHandler(UserRegisteredEvent)
 export class SendConfirmationEmailHandler

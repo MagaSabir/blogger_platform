@@ -24,6 +24,9 @@ import { RegistrationResendingUseCase } from './application/usecases/registratio
 import { PasswordRecoveryUseCase } from './application/usecases/password-recovery.usecase';
 import { ConfirmationUseCase } from './application/usecases/confirmation.usecase';
 import { DeleteUserCase } from './application/usecases/admins/delete-user.usecase';
+import { SessionRepository } from '../session/infrastructure/session.repository';
+import { Session, SessionSchema } from '../session/domain/session.domain';
+import { SecurityController } from '../security/api/security.controller';
 
 const refreshTokenConnectionProvider = [
   {
@@ -61,14 +64,18 @@ const queryHandler = [GetAllUsersQueryHandler, GetUserByIdHandler];
     CqrsModule,
     JwtModule,
     PassportModule,
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: Session.name, schema: SessionSchema },
+    ]),
   ],
-  controllers: [UsersController, AuthController],
+  controllers: [UsersController, AuthController, SecurityController],
   providers: [
     UsersService,
     UsersRepository,
     UsersQueryRepository,
     AuthQueryRepository,
+    SessionRepository,
     BasicStrategy,
     AuthService,
     BcryptService,

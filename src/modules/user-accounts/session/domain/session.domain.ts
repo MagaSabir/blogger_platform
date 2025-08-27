@@ -1,5 +1,6 @@
-import { Prop, Schema } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
+import { User } from '../../users/domain/users.domain';
 
 @Schema()
 export class Session {
@@ -15,11 +16,15 @@ export class Session {
   @Prop({ type: String, required: true })
   ip: string;
 
-  @Prop({ type: Date, required: true })
-  lastActive: Date;
+  @Prop({ type: Number, required: true })
+  lastActiveDate: number;
 
-  @Prop({ type: Date, required: true })
-  expiration: Date;
+  @Prop({ type: Number, required: true })
+  expiration: number;
 }
+
+export const SessionSchema = SchemaFactory.createForClass(Session);
+SessionSchema.loadClass(Session);
+
 export type SessionDocument = HydratedDocument<Session>;
 export type SessionModelType = Model<SessionDocument> & typeof Session;

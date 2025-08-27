@@ -2,16 +2,18 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
-import { MongooseModule } from '@nestjs/mongoose';
+import { getConnectionToken } from '@nestjs/mongoose';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { BasicAuthGuard } from '../src/modules/user-accounts/users/guards/basic/basic-auth.guard';
+import { Connection } from 'mongoose';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
+  let connection: Connection;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
-        MongooseModule.forRoot('mongodb://0.0.0.0:27017/blogPlatform_test'),
         ThrottlerModule.forRoot([
           {
             ttl: 10000, // 10 секунд
@@ -23,10 +25,20 @@ describe('AuthController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.getHttpAdapter().getInstance().set('trust proxy', true);
-    await app.init();
-  });
+    connection = moduleFixture.get<Connection>(getConnectionToken());
 
+    const basicAuthGuard = app.get(BasicAuthGuard);
+    app.useGlobalGuards(basicAuthGuard);
+    app.getHttpAdapter().getInstance().set('trust proxy', true);
+
+    await app.init();
+    for (const collection of Object.keys(connection.collections)) {
+      await connection.collections[collection].deleteMany({});
+    }
+  });
+  afterEach(async () => {
+    // // 💡 Чистим все коллекции после каждого теста
+  });
   afterAll(async () => {
     await app.close();
   });
@@ -116,6 +128,44 @@ describe('AuthController (e2e)', () => {
         .set('X-Forwarded-For', '192.168.1.2')
         .send(loginData)
         .expect(401);
+    });
+  });
+
+  describe('Session', () => {
+    const basicAuthCredentials = 'admin:qwerty'; // замените на ваши реальные credentials
+    const base64Credentials =
+      Buffer.from(basicAuthCredentials).toString('base64');
+    console.log(base64Credentials);
+    let token;
+    const loginData = {
+      loginOrEmail: 'test2',
+      password: 'test2',
+    };
+    it('should create user and login', async () => {
+      const basicAuthCredentials = 'admin:qwerty';
+      const base64Credentials =
+        Buffer.from(basicAuthCredentials).toString('base64');
+
+      // Создаём пользователя
+      const user = await request(app.getHttpServer())
+        .post('/users')
+        .set('Authorization', `Basic ${base64Credentials}`)
+        .send({
+          login: 'test2',
+          password: 'test2',
+          email: 'example@example2.com',
+        })
+        .expect(201);
+      console.log(user.body);
+
+      // Логинимся тем же пользователем
+      const response = await request(app.getHttpServer())
+        .post('/auth/login')
+        .send({ loginOrEmail: 'test2', password: 'test2' })
+        .expect(200);
+
+      const token = response.body.accessToken;
+      console.log('Token:', token);
     });
   });
 });

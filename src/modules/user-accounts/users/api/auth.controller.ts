@@ -42,16 +42,22 @@ export class AuthController {
   }
 
   @Post('login')
-  @UseGuards(ThrottlerGuard, LocalAuthGuard) // Добавьте ThrottlerGuard
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async login(@Req() req: { user: { id: string } }, @Res() res: Response) {
+  async login(
+    @Req() req: { user: { id: string }; ip: string; headers: any },
+    @Res() res: Response,
+  ) {
+    const ip = req.ip;
+    const userAgent: string = req.headers['user-agent']
+      ? req.headers['user-agent']
+      : '';
     const {
       accessToken,
       refreshToken,
     }: { accessToken: string; refreshToken: string } =
       await this.commandBus.execute(
-        new LoginUserCommand({ userId: req.user.id }),
+        new LoginUserCommand({ userId: req.user.id }, ip, userAgent),
       );
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,

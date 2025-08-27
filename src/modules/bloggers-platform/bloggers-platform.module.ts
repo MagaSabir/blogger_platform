@@ -37,6 +37,7 @@ import { LikePostUseCase } from './post/application/usecases/liike-post.usecase'
 import { GetPostQueryHandler } from './post/application/quries/get-post.query';
 import { GetAllPostsQueryHandler } from './post/application/quries/get-all-posts.query';
 import { GetPostByBlogIdQueryHandler } from './blog/application/quries/get-post-by-id.query';
+import { CreateBlogUseCase } from './blog/application/usecases/create-blog-usecase';
 
 const queryHandlers = [
   GetAllCommentByIdHandler,
@@ -46,6 +47,7 @@ const queryHandlers = [
   GetPostByBlogIdQueryHandler,
 ];
 const commandHandlers = [
+  CreateBlogUseCase,
   CommentCreateUseCase,
   UpdateCommentUseCase,
   DeleteCommentUseCase,

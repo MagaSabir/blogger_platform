@@ -6,11 +6,12 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
-import { SessionRepository } from '../../../session/infrastructure/session.repository';
+import { SessionQueryRepository } from '../../../session/infrastructure/query-repo/session.query-repository';
+import { TokenPayloadType } from '../../../security/types/token-payload.type';
 
 export class RefreshTokenGuard implements CanActivate {
   constructor(
-    private sessionRepo: SessionRepository,
+    private sessionRepo: SessionQueryRepository,
     @Inject('REFRESH-TOKEN') private refreshTokenContext: JwtService,
   ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -21,12 +22,7 @@ export class RefreshTokenGuard implements CanActivate {
     }
 
     try {
-      const payload: {
-        userId: string;
-        deviceId: string;
-        iat: number;
-        exp: number;
-      } = this.refreshTokenContext.verify(token);
+      const payload: TokenPayloadType = this.refreshTokenContext.verify(token);
       const session = await this.sessionRepo.getSession(
         payload.userId,
         payload.deviceId,

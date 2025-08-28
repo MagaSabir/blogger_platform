@@ -3,9 +3,10 @@ import {
   Session,
   SessionDocument,
   SessionModelType,
-} from '../domain/session.domain';
+} from '../../domain/session.domain';
+import { SessionViewDto } from '../../../security/application/queries/view-dto/session-view-dto';
 
-export class SessionRepository {
+export class SessionQueryRepository {
   constructor(
     @InjectModel(Session.name) private sessionModel: SessionModelType,
   ) {}
@@ -14,18 +15,20 @@ export class SessionRepository {
     await this.sessionModel.create(dto);
   }
 
-  async getSession(
-    userId: string,
-    deviceId: string,
-  ): Promise<SessionDocument | null> {
-    return this.sessionModel.findOne({ userId, deviceId });
+  async getSession(userId: string, deviceId: string) {
+    const session: SessionDocument | null = await this.sessionModel.findOne({
+      userId,
+      deviceId,
+    });
+    return session;
   }
 
   async getAllActiveSessions(userId: string) {
-    return this.sessionModel.find({
+    const session: SessionDocument[] = await this.sessionModel.find({
       userId,
       expiration: { $gt: Math.floor(Date.now() / 1000) },
     });
+    return SessionViewDto.mapToView(session);
   }
 }
 

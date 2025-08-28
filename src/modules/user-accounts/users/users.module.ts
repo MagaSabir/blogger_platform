@@ -24,9 +24,12 @@ import { RegistrationResendingUseCase } from './application/usecases/registratio
 import { PasswordRecoveryUseCase } from './application/usecases/password-recovery.usecase';
 import { ConfirmationUseCase } from './application/usecases/confirmation.usecase';
 import { DeleteUserCase } from './application/usecases/admins/delete-user.usecase';
-import { SessionRepository } from '../session/infrastructure/session.repository';
 import { Session, SessionSchema } from '../session/domain/session.domain';
 import { SecurityController } from '../security/api/security.controller';
+import { SessionQueryRepository } from '../session/infrastructure/query-repo/session.query-repository';
+import { GetAllActiveDevicesQueryHandler } from '../security/application/queries/get-all-active-devices.query';
+import { DeleteSessionByIdUseCase } from '../security/application/usecases/delete-session-by-id.usecase';
+import { SessionRepository } from '../session/infrastructure/session-repository';
 
 const refreshTokenConnectionProvider = [
   {
@@ -57,8 +60,13 @@ const commandHandlers = [
   PasswordRecoveryUseCase,
   ConfirmationUseCase,
   DeleteUserCase,
+  DeleteSessionByIdUseCase,
 ];
-const queryHandler = [GetAllUsersQueryHandler, GetUserByIdHandler];
+const queryHandler = [
+  GetAllUsersQueryHandler,
+  GetUserByIdHandler,
+  GetAllActiveDevicesQueryHandler,
+];
 @Module({
   imports: [
     CqrsModule,
@@ -75,6 +83,7 @@ const queryHandler = [GetAllUsersQueryHandler, GetUserByIdHandler];
     UsersRepository,
     UsersQueryRepository,
     AuthQueryRepository,
+    SessionQueryRepository,
     SessionRepository,
     BasicStrategy,
     AuthService,

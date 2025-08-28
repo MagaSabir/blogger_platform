@@ -9,7 +9,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { AuthService } from '../application/service/auth.service';
 import { CreateUserInputDto } from './input-dto/create-user.dto';
 import { LocalAuthGuard } from '../guards/local/local.auth.guard';
@@ -25,8 +25,12 @@ import { PasswordRecoveryCommand } from '../application/usecases/password-recove
 import { NewPasswordCommand } from '../application/usecases/new-password.usecase';
 import { ConfirmationCommand } from '../application/usecases/confirmation.usecase';
 import { RegistrationResendingCommand } from '../application/usecases/registration-resending.usecase';
-import { ThrottlerGuard } from '@nestjs/throttler';
 
+interface CustomRequest extends Request {
+  user: {
+    id: string;
+  };
+}
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -44,14 +48,9 @@ export class AuthController {
   @Post('login')
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async login(
-    @Req() req: { user: { id: string }; ip: string; headers: any },
-    @Res() res: Response,
-  ) {
-    const ip = req.ip;
-    const userAgent: string = req.headers['user-agent']
-      ? req.headers['user-agent']
-      : '';
+  async login(@Req() req: CustomRequest, @Res() res: Response) {
+    const ip = req.ip || 'undefined';
+    const userAgent: string = req.headers['user-agent'] || 'undefined';
     const {
       accessToken,
       refreshToken,

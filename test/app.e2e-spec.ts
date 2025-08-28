@@ -17,9 +17,17 @@ describe('AppController (e2e)', () => {
   });
 
   it('/ (GET)', () => {
+    const basicAuthCredentials = 'admin:qwerty';
+    const base64Credentials =
+      Buffer.from(basicAuthCredentials).toString('base64');
     return request(app.getHttpServer())
-      .get('/')
-      .expect(200)
-      .expect('Hello World!');
+      .post('/users')
+      .set('Authorization', `Basic ${base64Credentials}`)
+      .send({
+        login: 'test3',
+        password: 'test3',
+        email: 'example@example3.com',
+      })
+      .expect(201);
   });
 });

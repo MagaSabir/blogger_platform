@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { Inject } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { randomUUID } from 'crypto';
-import { SessionRepository } from '../../../session/infrastructure/session.repository';
+import { SessionQueryRepository } from '../../../session/infrastructure/query-repo/session.query-repository';
 
 export class LoginUserCommand {
   constructor(
@@ -16,7 +16,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
   constructor(
     @Inject('ACCESS-TOKEN') private accessTokenContext: JwtService,
     @Inject('REFRESH-TOKEN') private refreshTokenContext: JwtService,
-    private sessionRepo: SessionRepository,
+    private sessionRepo: SessionQueryRepository,
   ) {}
 
   async execute(dto: LoginUserCommand) {
@@ -34,7 +34,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
       iat: number;
       exp: number;
     } = this.refreshTokenContext.verify(refreshToken);
-    console.log(payload.exp);
+
     const session = {
       userId: dto.dto.userId,
       deviceId,

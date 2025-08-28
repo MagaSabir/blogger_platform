@@ -4,8 +4,8 @@ import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { getConnectionToken } from '@nestjs/mongoose';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { BasicAuthGuard } from '../src/modules/user-accounts/users/guards/basic/basic-auth.guard';
 import { Connection } from 'mongoose';
+import cookieParser from 'cookie-parser';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
@@ -25,10 +25,11 @@ describe('AuthController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.use(cookieParser());
+
     connection = moduleFixture.get<Connection>(getConnectionToken());
 
-    const basicAuthGuard = app.get(BasicAuthGuard);
-    app.useGlobalGuards(basicAuthGuard);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     app.getHttpAdapter().getInstance().set('trust proxy', true);
 
     await app.init();
@@ -36,9 +37,7 @@ describe('AuthController (e2e)', () => {
       await connection.collections[collection].deleteMany({});
     }
   });
-  afterEach(async () => {
-    // // 💡 Чистим все коллекции после каждого теста
-  });
+
   afterAll(async () => {
     await app.close();
   });
@@ -132,11 +131,9 @@ describe('AuthController (e2e)', () => {
   });
 
   describe('Session', () => {
-    const basicAuthCredentials = 'admin:qwerty'; // замените на ваши реальные credentials
-    const base64Credentials =
-      Buffer.from(basicAuthCredentials).toString('base64');
-    console.log(base64Credentials);
-    let token;
+    let token: string;
+    let cookies: [] | string;
+    let deviceId: string;
     const loginData = {
       loginOrEmail: 'test2',
       password: 'test2',
@@ -146,8 +143,7 @@ describe('AuthController (e2e)', () => {
       const base64Credentials =
         Buffer.from(basicAuthCredentials).toString('base64');
 
-      // Создаём пользователя
-      const user = await request(app.getHttpServer())
+      await request(app.getHttpServer())
         .post('/users')
         .set('Authorization', `Basic ${base64Credentials}`)
         .send({
@@ -156,16 +152,33 @@ describe('AuthController (e2e)', () => {
           email: 'example@example2.com',
         })
         .expect(201);
-      console.log(user.body);
 
-      // Логинимся тем же пользователем
       const response = await request(app.getHttpServer())
         .post('/auth/login')
-        .send({ loginOrEmail: 'test2', password: 'test2' })
+        .set('User-Agent', 'test')
+        .send(loginData)
         .expect(200);
-
-      const token = response.body.accessToken;
+      cookies = response.headers['set-cookie'];
+      token = cookies[0];
       console.log('Token:', token);
+    });
+
+    it('should get all active sessions', async () => {
+      const session = await request(app.getHttpServer())
+        .get('/security/devices')
+        .set('Cookie', token)
+        .expect(200);
+      expect(session.body).toBeDefined();
+      expect(session.body).toHaveLength(1);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
+      deviceId = session.body[0].deviceId;
+    });
+
+    it('should delete session by device id', async () => {
+      await request(app.getHttpServer())
+        .delete(`/security/devices/${deviceId}`)
+        .set('Cookie', token)
+        .expect(204);
     });
   });
 });

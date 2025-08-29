@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { BloggersPlatformModule } from './modules/bloggers-platform/bloggers-platform.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { TestingModule } from './modules/testing/testing.module';
-import { UsersModule } from './modules/user-accounts/users/users.module';
+import { UsersModule } from './modules/user-accounts/users.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { DomainHttpExceptionsFilter } from './core/exceptions/filters/error-exception-filter';
@@ -16,7 +16,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     ThrottlerModule.forRoot({
       throttlers: [
         {
-          ttl: 60000,
+          ttl: 10000,
           limit: 5,
         },
       ],
@@ -30,10 +30,6 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
   providers: [
     AppService,
     { provide: APP_FILTER, useClass: DomainHttpExceptionsFilter },
-    {
-      provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
   ],
 })
 export class AppModule {}

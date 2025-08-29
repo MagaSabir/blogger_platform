@@ -13,6 +13,7 @@ import { SessionQueryRepository } from '../../session/infrastructure/query-repo/
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetAllActiveDevicesQuery } from '../application/queries/get-all-active-devices.query';
 import { DeleteSessionByIdCommand } from '../application/usecases/delete-session-by-id.usecase';
+import { DeleteAllActiveSessionsCommand } from '../application/usecases/delete-all-active-sessions.usecase';
 
 @UseGuards(RefreshTokenGuard)
 @Controller('security')
@@ -36,5 +37,11 @@ export class SecurityController {
     await this.commandBus.execute(
       new DeleteSessionByIdCommand(deviceId, token),
     );
+  }
+
+  @Delete('devices')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteActiveAllSessions(@GetRefreshToken() token: string) {
+    await this.commandBus.execute(new DeleteAllActiveSessionsCommand(token));
   }
 }

@@ -160,7 +160,6 @@ describe('AuthController (e2e)', () => {
         .expect(200);
       cookies = response.headers['set-cookie'];
       token = cookies[0];
-      console.log('Token:', token);
     });
 
     it('should get all active sessions', async () => {
@@ -179,6 +178,64 @@ describe('AuthController (e2e)', () => {
         .delete(`/security/devices/${deviceId}`)
         .set('Cookie', token)
         .expect(204);
+    });
+  });
+
+  describe('should create 3 user with different deviceId, loged,  delete other sessions', () => {
+    let token: string;
+
+    it('should create 3 user', async () => {
+      const basicAuthCredentials = 'admin:qwerty';
+      const base64Credentials =
+        Buffer.from(basicAuthCredentials).toString('base64');
+      await request(app.getHttpServer())
+        .post('/users')
+        .set('Authorization', `Basic ${base64Credentials}`)
+        .send({
+          login: 'test3',
+          password: 'test3',
+          email: 'example@example3.com',
+        })
+        .expect(201);
+      const response = await request(app.getHttpServer())
+        .post('/users')
+        .set('Authorization', `Basic ${base64Credentials}`)
+        .send({
+          login: 'test4',
+          password: 'test4',
+          email: 'example@example4.com',
+        })
+        .expect(201);
+
+      const response2 = await request(app.getHttpServer())
+        .post('/auth/login')
+        .set('User-Agent', 'test')
+        .send({ loginOrEmail: 'test4', password: 'test4' })
+        .expect(200);
+      const cookies = response2.headers['set-cookie'];
+      token = cookies[0];
+    });
+
+    it('should get all active sessions', async () => {
+      const session = await request(app.getHttpServer())
+        .get('/security/devices')
+        .set('Cookie', token)
+        .expect(200);
+      expect(session.body).toBeDefined();
+    });
+
+    it('should delete all sessions except the current one', async () => {
+      const sessions = await request(app.getHttpServer())
+        .delete('/security/devices')
+        .set('Cookie', token)
+        .expect(204);
+
+      const res = await request(app.getHttpServer())
+        .get('/security/devices')
+        .set('Cookie', token)
+        .expect(200);
+      expect(res.body).toBeDefined();
+      console.log(res.body);
     });
   });
 });

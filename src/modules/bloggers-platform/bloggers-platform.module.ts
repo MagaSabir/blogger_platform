@@ -18,7 +18,7 @@ import { CommentCreateUseCase } from './comments/application/usecases/comment-cr
 import { GetCommentHandler } from './comments/application/queries/get-comment.query';
 import { CqrsModule } from '@nestjs/cqrs';
 import { JwtModule } from '@nestjs/jwt';
-import { UsersModule } from '../user-accounts/users/users.module';
+import { UsersModule } from '../user-accounts/users.module';
 import { UpdateCommentUseCase } from './comments/application/usecases/update-comment.usecase';
 import { GetAllCommentByIdHandler } from './comments/application/queries/get-all-comments-by-id.query';
 import { DeleteCommentUseCase } from './comments/application/usecases/delete-comment.usecase';

@@ -103,6 +103,7 @@ export class PostController {
       postId: postId,
       user: { userId: req.user.id, userLogin: user.login },
     };
+    console.log(dto);
     const commentId: string = await this.commandBus.execute<
       CommentCreateCommand,
       string
@@ -120,6 +121,7 @@ export class PostController {
     @Query() query: CommentQueryParams,
   ) {
     const userId = req.user?.id ?? null;
+
     return await this.queryBus.execute<GetAllCommentsByIdQuery, object>(
       new GetAllCommentsByIdQuery(postId, userId, query),
     );

@@ -11,10 +11,6 @@ export class SessionQueryRepository {
     @InjectModel(Session.name) private sessionModel: SessionModelType,
   ) {}
 
-  async createSession(dto: sessionCreateDto) {
-    await this.sessionModel.create(dto);
-  }
-
   async getSession(userId: string, deviceId: string) {
     const session: SessionDocument | null = await this.sessionModel.findOne({
       userId,

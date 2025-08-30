@@ -9,12 +9,9 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
-import { BlogsService } from '../application/blogs.service';
 import { BlogViewDto } from '../application/quries/view-dto/blog.view-dto';
-import { QueryBlogRepository } from '../infrastructure/query-repository/query.blog.repository';
 import { BlogsQueryParams } from './input-validation-dto/blogs-query-params';
 import { PostsQueryParams } from '../../post/api/input-validation-dto/PostsQueryParams';
 import { BasePaginatedResponse } from '../../../../core/base-paginated-response';
@@ -33,13 +30,13 @@ import { CreateBlogCommand } from '../application/usecases/create-blog-usecase';
 import { UpdateBlogCommand } from '../application/usecases/update-blog-usecase';
 import { DeleteBlogCommand } from '../application/usecases/delete-blog-usecase';
 import { GetBlogByIdQuery } from '../application/quries/get-blog-by-id.query';
+import { GetAllBlogsQuery } from '../application/quries/get-all-blogs.query';
+import { CurrentUserId } from '../../../../core/decorators/current-user-id';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    private blogService: BlogsService,
     private postService: PostService,
-    private blogQueryRepo: QueryBlogRepository,
     private queryBus: QueryBus,
     private commandBus: CommandBus,
   ) {}
@@ -47,7 +44,7 @@ export class BlogsController {
   async getBlogs(
     @Query() query: BlogsQueryParams,
   ): Promise<BasePaginatedResponse<BlogViewDto>> {
-    return await this.blogQueryRepo.getAllBlogs(query);
+    return this.queryBus.execute(new GetAllBlogsQuery(query));
   }
 
   @Get(':id')
@@ -63,7 +60,7 @@ export class BlogsController {
     const id: string = await this.commandBus.execute(
       new CreateBlogCommand(body),
     );
-    return this.blogQueryRepo.getBlog(id);
+    return await this.queryBus.execute(new GetBlogByIdQuery(id));
   }
 
   @Put(':id')
@@ -88,9 +85,8 @@ export class BlogsController {
   async getPostByBlogId(
     @Param('id') id: string,
     @Query() query: PostsQueryParams,
-    @Req() req: { user: { id: string } },
+    @CurrentUserId() userId: string,
   ): Promise<BasePaginatedResponse<PostViewDto>> {
-    const userId: string = req.user?.id ?? null;
     return this.queryBus.execute(new GetPostByBlogIdQuery(id, query, userId));
   }
 
@@ -99,11 +95,11 @@ export class BlogsController {
   async createPostByBlogId(
     @Body() dto: CreatePostByBlogId,
     @Param('id') id: string,
-    @Req() req: { user: { id: string } },
+    @CurrentUserId() userId: string,
   ): Promise<PostViewDto> {
     const postId: string = await this.postService.createdPostByBlogId(dto, id);
     return this.queryBus.execute<GetPostQuery, PostViewDto>(
-      new GetPostQuery(postId, req.user.id),
+      new GetPostQuery(postId, userId),
     );
   }
 }

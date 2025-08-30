@@ -9,8 +9,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { AuthService } from '../application/service/auth.service';
+import { Response, Request } from 'express';
 import { CreateUserInputDto } from './input-dto/create-user.dto';
 import { LocalAuthGuard } from '../guards/local/local.auth.guard';
 import { JwtAuthGuard } from '../guards/bearer/jwt-auth.guard';
@@ -30,12 +29,9 @@ import { GetRefreshToken } from '../../decorators/get-refresh-token';
 import { RefreshTokenCommand } from '../application/usecases/refresh-token.usecase';
 import { LogoutCommand } from '../application/usecases/logout.usecase';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { AuthenticatedRequest } from '../../../../core/interfaces/authenticated-request';
+import { CurrentUserId } from '../../../../core/decorators/current-user-id';
 
-interface CustomRequest extends Request {
-  user: {
-    id: string;
-  };
-}
 @Controller('auth')
 @UseGuards(ThrottlerGuard)
 export class AuthController {
@@ -55,7 +51,11 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 10000 } })
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async login(@Req() req: CustomRequest, @Res() res: Response) {
+  async login(
+    @CurrentUserId() userId: string,
+    @Res() res: Response,
+    @Req() req: Request,
+  ) {
     const ip = req.ip || 'undefined';
     const userAgent: string = req.headers['user-agent'] || 'undefined';
     const {
@@ -63,7 +63,7 @@ export class AuthController {
       refreshToken,
     }: { accessToken: string; refreshToken: string } =
       await this.commandBus.execute(
-        new LoginUserCommand({ userId: req.user.id }, ip, userAgent),
+        new LoginUserCommand({ userId }, ip, userAgent),
       );
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -75,8 +75,8 @@ export class AuthController {
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  async me(@Req() req: { user: { id: string } }) {
-    return this.authQueryRepo.getUser(req.user.id);
+  async me(@CurrentUserId() userId: string) {
+    return this.authQueryRepo.getUser(userId);
   }
 
   @Post('registration-confirmation')

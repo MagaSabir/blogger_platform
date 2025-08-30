@@ -38,6 +38,7 @@ import { GetPostQueryHandler } from './post/application/quries/get-post.query';
 import { GetAllPostsQueryHandler } from './post/application/quries/get-all-posts.query';
 import { GetPostByBlogIdQueryHandler } from './blog/application/quries/get-post-by-id.query';
 import { CreateBlogUseCase } from './blog/application/usecases/create-blog-usecase';
+import { GetBlogByIdQueryHandler } from './blog/application/quries/get-blog-by-id.query';
 
 const queryHandlers = [
   GetAllCommentByIdHandler,
@@ -45,6 +46,7 @@ const queryHandlers = [
   GetPostQueryHandler,
   GetAllPostsQueryHandler,
   GetPostByBlogIdQueryHandler,
+  GetBlogByIdQueryHandler,
 ];
 const commandHandlers = [
   CreateBlogUseCase,

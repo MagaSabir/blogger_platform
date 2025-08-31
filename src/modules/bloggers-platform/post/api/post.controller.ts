@@ -9,10 +9,8 @@ import {
   Post,
   Put,
   Query,
-  Req,
   UseGuards,
 } from '@nestjs/common';
-import { PostService } from '../application/service/post.service';
 import { PostsQueryParams } from './input-validation-dto/PostsQueryParams';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CommentCreateCommand } from '../../comments/application/usecases/comment-create.usecase';
@@ -31,18 +29,23 @@ import { JwtOptionalAuthGuard } from '../../../user-accounts/users/guards/bearer
 import { LikePostCommand } from '../application/usecases/liike-post.usecase';
 import { GetPostQuery } from '../application/quries/get-post.query';
 import { GetAllPostsQuery } from '../application/quries/get-all-posts.query';
+import { CreatePostCommand } from '../application/usecases/create-post-usecase';
+import { CurrentUserId } from '../../../../core/decorators/current-user-id';
+import { DeletePostCommand } from '../application/usecases/delete-post.usecase';
+import { UpdatePostCommand } from '../application/usecases/update-post.usecase';
 
 @Controller('posts')
 export class PostController {
   constructor(
     private commandBus: CommandBus,
     private queryBus: QueryBus,
-    private postService: PostService,
   ) {}
   @Post()
   @UseGuards(BasicAuthGuard)
   async createPost(@Body() dto: CreateInputPostDto) {
-    const postId: string = await this.postService.createPost(dto);
+    const postId: string = await this.commandBus.execute(
+      new CreatePostCommand(dto),
+    );
     return await this.queryBus.execute<GetPostQuery, object>(
       new GetPostQuery(postId),
     );
@@ -50,11 +53,7 @@ export class PostController {
 
   @Get(':id')
   @UseGuards(JwtOptionalAuthGuard)
-  async getPostById(
-    @Param('id') id: string,
-    @Req() req: { user: { id: string } },
-  ) {
-    const userId = req.user?.id ?? null;
+  async getPostById(@Param('id') id: string, @CurrentUserId() userId: string) {
     return await this.queryBus.execute<GetPostQuery, object>(
       new GetPostQuery(id, userId),
     );
@@ -64,10 +63,8 @@ export class PostController {
   @UseGuards(JwtOptionalAuthGuard)
   async getPosts(
     @Query() query: PostsQueryParams,
-    @Req() req: { user: { id: string } },
+    @CurrentUserId() userId: string,
   ) {
-    const userId = req.user?.id ?? null;
-
     return await this.queryBus.execute<GetAllPostsQuery, object>(
       new GetAllPostsQuery(query, userId),
     );
@@ -77,14 +74,14 @@ export class PostController {
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async updatePost(@Param('id') id: string, @Body() dto: CreateInputPostDto) {
-    return await this.postService.updatePost(id, dto);
+    await this.commandBus.execute(new UpdatePostCommand(dto, id));
   }
 
   @Delete(':id')
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deletePost(@Param('id') id: string) {
-    return await this.postService.deletePost(id);
+    await this.commandBus.execute(new DeletePostCommand(id));
   }
 
   @Post(':id/comments')
@@ -92,18 +89,17 @@ export class PostController {
   async createComment(
     @Body() body: CommentInputDto,
     @Param('id', ObjectIdValidationPipe) postId: string,
-    @Req() req: { user: { id: string } },
+    @CurrentUserId() userId: string,
   ) {
     const user: UserViewDto = await this.queryBus.execute<
       GetUserByIdQuery,
       UserViewDto
-    >(new GetUserByIdQuery(req.user.id));
+    >(new GetUserByIdQuery(userId));
     const dto = {
       content: body.content,
       postId: postId,
-      user: { userId: req.user.id, userLogin: user.login },
+      user: { userId: userId, userLogin: user.login },
     };
-    console.log(dto);
     const commentId: string = await this.commandBus.execute<
       CommentCreateCommand,
       string
@@ -117,11 +113,9 @@ export class PostController {
   @UseGuards(JwtOptionalAuthGuard)
   async getCommentsByPostId(
     @Param('id', ObjectIdValidationPipe) postId: string,
-    @Req() req: { user: { id: string } },
+    @CurrentUserId() userId: string,
     @Query() query: CommentQueryParams,
   ) {
-    const userId = req.user?.id ?? null;
-
     return await this.queryBus.execute<GetAllCommentsByIdQuery, object>(
       new GetAllCommentsByIdQuery(postId, userId, query),
     );
@@ -133,10 +127,10 @@ export class PostController {
   async likePost(
     @Body() status: LikeStatusInputDto,
     @Param('id', ObjectIdValidationPipe) id: string,
-    @Req() req: { user: { id: string } },
+    @CurrentUserId() userId: string,
   ) {
     await this.commandBus.execute(
-      new LikePostCommand(id, req.user.id, status.likeStatus),
+      new LikePostCommand(id, userId, status.likeStatus),
     );
   }
 }

@@ -12,12 +12,12 @@ export class PostService {
     private blogRepo: BlogsRepository,
     @InjectModel(Post.name) private PostModel: PostModelType,
   ) {}
-  async createPost(dto: CreatedPostDto): Promise<string> {
-    const blog = await this.blogRepo.findBlogById(dto.blogId);
-    if (!blog) throw new NotFoundException('Blog not found');
-    const post: PostDocument = this.PostModel.createdPost(dto, blog.name);
-    return this.postRepo.save(post);
-  }
+  // async createPost(dto: CreatedPostDto): Promise<string> {
+  //   const blog = await this.blogRepo.findBlogById(dto.blogId);
+  //   if (!blog) throw new NotFoundException('Blog not found');
+  //   const post: PostDocument = this.PostModel.createdPost(dto, blog.name);
+  //   return this.postRepo.save(post);
+  // }
 
   async createdPostByBlogId(
     dto: Omit<CreatedPostDto, 'blogId'>,

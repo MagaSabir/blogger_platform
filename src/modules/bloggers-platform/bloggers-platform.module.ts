@@ -39,6 +39,9 @@ import { GetAllPostsQueryHandler } from './post/application/quries/get-all-posts
 import { GetPostByBlogIdQueryHandler } from './blog/application/quries/get-post-by-id.query';
 import { CreateBlogUseCase } from './blog/application/usecases/create-blog-usecase';
 import { GetBlogByIdQueryHandler } from './blog/application/quries/get-blog-by-id.query';
+import { CreatePostUseCase } from './post/application/usecases/create-post-usecase';
+import { DeletePostUserCase } from './post/application/usecases/delete-post.usecase';
+import { UpdatePostUseCase } from './post/application/usecases/update-post.usecase';
 
 const queryHandlers = [
   GetAllCommentByIdHandler,
@@ -55,6 +58,9 @@ const commandHandlers = [
   DeleteCommentUseCase,
   SetLikeUseCase,
   LikePostUseCase,
+  CreatePostUseCase,
+  DeletePostUserCase,
+  UpdatePostUseCase,
 ];
 @Module({
   imports: [

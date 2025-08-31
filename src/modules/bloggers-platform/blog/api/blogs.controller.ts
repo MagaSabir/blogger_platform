@@ -36,7 +36,7 @@ import { CurrentUserId } from '../../../../core/decorators/current-user-id';
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    private postService: PostService,
+    // private postService: PostService,
     private queryBus: QueryBus,
     private commandBus: CommandBus,
   ) {}
@@ -98,6 +98,7 @@ export class BlogsController {
     @CurrentUserId() userId: string,
   ): Promise<PostViewDto> {
     const postId: string = await this.postService.createdPostByBlogId(dto, id);
+
     return this.queryBus.execute<GetPostQuery, PostViewDto>(
       new GetPostQuery(postId, userId),
     );

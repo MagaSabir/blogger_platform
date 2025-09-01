@@ -22,21 +22,6 @@ export class QueryPostRepository {
       deletedAt: null,
     }).lean();
   }
-  // if (!post) throw new NotFoundException('Not Found');
-
-  //   const status = userId
-  //     ? await this.LikePostModel.findOne({ postId: id, userId }).lean()
-  //     : null;
-  //
-  //   const newestLikes = await this.LikePostModel.find({
-  //     postId: id,
-  //     likeStatus: 'Like',
-  //   })
-  //     .sort({ addedAt: -1 })
-  //     .limit(3)
-  //     .lean();
-  //   return PostViewDto.mapPostToView(post, status, newestLikes);
-  // }
 
   async getPosts(query: PostsQueryParams, userId?: string) {
     const filter = { deletedAt: null };
@@ -54,36 +39,7 @@ export class QueryPostRepository {
       this.PostModel.countDocuments(filter),
     ]);
 
-    // const postIds = posts.map((post) => post._id);
-    // const userLikes = userId
-    //   ? await this.LikePostModel.find({
-    //       postId: { $in: postIds },
-    //       userId: userId,
-    //     }).lean()
-    //   : [];
-    //
-    // const newestLikes = await this.LikePostModel.find({
-    //   postId: { $in: postIds },
-    //   likeStatus: 'Like',
-    // })
-    //   .sort({ addedAt: -1 })
-    //   .limit(3)
-    //   .lean();
-    //
-    // const items = posts.map((post) => {
-    //   const likes = newestLikes.filter(
-    //     (l) => l.postId.toString() === post._id.toString(),
-    //   );
-    //
-    //   const likeStatus = userLikes.find(
-    //     (l) => l.postId.toString() === post._id.toString(),
-    //   );
-    //   return PostViewDto.mapToView(post, likeStatus, likes);
-    // });
     return {
-      // pagesCount: Math.ceil(totalCount / limit),
-      // page: query.pageNumber,
-      // pageSize: query.pageSize,
       posts,
       totalCount,
     };
@@ -113,9 +69,6 @@ export class QueryPostRepository {
     ]);
 
     return {
-      // pagesCount: Math.ceil(totalCount / limit),
-      // page: query.pageNumber,
-      // pageSize: query.pageSize,
       posts,
       totalCount,
     };

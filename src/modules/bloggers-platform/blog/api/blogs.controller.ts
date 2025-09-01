@@ -16,7 +16,6 @@ import { BlogsQueryParams } from './input-validation-dto/blogs-query-params';
 import { PostsQueryParams } from '../../post/api/input-validation-dto/PostsQueryParams';
 import { BasePaginatedResponse } from '../../../../core/base-paginated-response';
 import { PostViewDto } from '../../post/application/quries/view-dto/post.view-dto';
-import { PostService } from '../../post/application/service/post.service';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
 import { CreateBlogDto } from './input-validation-dto/create-blog.dto';
 import { UpdateBlogInputDto } from './input-validation-dto/update-blog.dto';
@@ -32,11 +31,11 @@ import { DeleteBlogCommand } from '../application/usecases/delete-blog-usecase';
 import { GetBlogByIdQuery } from '../application/quries/get-blog-by-id.query';
 import { GetAllBlogsQuery } from '../application/quries/get-all-blogs.query';
 import { CurrentUserId } from '../../../../core/decorators/current-user-id';
+import { CreatePostByBlogIdCommand } from '../application/usecases/create-post-by-blogId-usecase';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
-    // private postService: PostService,
     private queryBus: QueryBus,
     private commandBus: CommandBus,
   ) {}
@@ -97,7 +96,9 @@ export class BlogsController {
     @Param('id') id: string,
     @CurrentUserId() userId: string,
   ): Promise<PostViewDto> {
-    const postId: string = await this.postService.createdPostByBlogId(dto, id);
+    const postId: string = await this.commandBus.execute(
+      new CreatePostByBlogIdCommand(dto, id),
+    );
 
     return this.queryBus.execute<GetPostQuery, PostViewDto>(
       new GetPostQuery(postId, userId),

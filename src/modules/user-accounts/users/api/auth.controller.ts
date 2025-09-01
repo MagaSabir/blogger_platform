@@ -28,9 +28,8 @@ import { RefreshTokenGuard } from '../guards/refresh-token/refresh-token-guard';
 import { GetRefreshToken } from '../../decorators/get-refresh-token';
 import { RefreshTokenCommand } from '../application/usecases/refresh-token.usecase';
 import { LogoutCommand } from '../application/usecases/logout.usecase';
-import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { AuthenticatedRequest } from '../../../../core/interfaces/authenticated-request';
 import { CurrentUserId } from '../../../../core/decorators/current-user-id';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('auth')
 @UseGuards(ThrottlerGuard)

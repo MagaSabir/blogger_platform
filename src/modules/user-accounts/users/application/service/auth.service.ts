@@ -14,6 +14,12 @@ export class AuthService {
 
   async validateUser(login: string, password: string) {
     const user = await this.userRepo.findUserByLoginOrEmail(login);
+    console.log('DEBUG validateUser', {
+      login,
+      password,
+      userPasswordHash: user?.passwordHash,
+    });
+
     if (!user) {
       return null;
     }

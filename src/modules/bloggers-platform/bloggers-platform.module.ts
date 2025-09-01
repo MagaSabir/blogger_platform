@@ -42,6 +42,7 @@ import { GetBlogByIdQueryHandler } from './blog/application/quries/get-blog-by-i
 import { CreatePostUseCase } from './post/application/usecases/create-post-usecase';
 import { DeletePostUserCase } from './post/application/usecases/delete-post.usecase';
 import { UpdatePostUseCase } from './post/application/usecases/update-post.usecase';
+import { GetAllBlogsQueryHandler } from './blog/application/quries/get-all-blogs.query';
 
 const queryHandlers = [
   GetAllCommentByIdHandler,
@@ -50,6 +51,7 @@ const queryHandlers = [
   GetAllPostsQueryHandler,
   GetPostByBlogIdQueryHandler,
   GetBlogByIdQueryHandler,
+  GetAllBlogsQueryHandler,
 ];
 const commandHandlers = [
   CreateBlogUseCase,

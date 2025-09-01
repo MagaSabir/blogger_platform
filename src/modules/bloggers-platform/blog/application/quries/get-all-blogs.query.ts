@@ -13,6 +13,6 @@ export class GetAllBlogsQueryHandler
   constructor(private blogsQueryRepo: QueryBlogRepository) {}
 
   async execute(query: GetAllBlogsQuery) {
-    await this.blogsQueryRepo.getAllBlogs(query.queryParams);
+    return this.blogsQueryRepo.getAllBlogs(query.queryParams);
   }
 }

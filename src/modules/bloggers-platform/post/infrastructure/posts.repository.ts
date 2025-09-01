@@ -29,8 +29,6 @@ export class PostsRepository {
       likeStatus: 'Dislike',
     });
 
-    console.log(likes, '----', dislike);
-
     await this.postModel.updateOne(
       { _id: postId },
       {

@@ -1,7 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InjectModel } from '@nestjs/mongoose';
-import { NotFoundException, Post } from '@nestjs/common';
-import { PostDocument, PostModelType } from '../../domain/post.entity';
+import { NotFoundException } from '@nestjs/common';
+import { PostDocument } from '../../domain/post.entity';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 
 export class DeletePostCommand {
@@ -10,10 +9,7 @@ export class DeletePostCommand {
 
 @CommandHandler(DeletePostCommand)
 export class DeletePostUserCase implements ICommandHandler<DeletePostCommand> {
-  constructor(
-    @InjectModel(Post.name) private postModel: PostModelType,
-    private postRepo: PostsRepository,
-  ) {}
+  constructor(private postRepo: PostsRepository) {}
 
   async execute(command: DeletePostCommand) {
     const post: PostDocument | null = await this.postRepo.findPostById(

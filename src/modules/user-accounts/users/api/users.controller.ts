@@ -11,7 +11,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersQueryRepository } from '../infrastructure/query-repository/users.query-repository';
-import { UsersService } from '../application/service/users.service';
 import { UsersQueryParams } from './input-dto/users-query-params';
 import { CreateUserInputDto } from './input-dto/create-user.dto';
 import { ObjectIdValidationPipe } from '../../../../core/pipes/object-id-validation.pipe';
@@ -26,7 +25,6 @@ import { GetAllUsersQuery } from '../application/queries/get-all-users.query';
 @UseGuards(BasicAuthGuard)
 export class UsersController {
   constructor(
-    private userService: UsersService,
     private commandBus: CommandBus,
     private queryBus: QueryBus,
     private userQueryRepo: UsersQueryRepository,

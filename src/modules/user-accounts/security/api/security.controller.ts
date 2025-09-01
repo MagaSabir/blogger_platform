@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { RefreshTokenGuard } from '../../users/guards/refresh-token/refresh-token-guard';
 import { GetRefreshToken } from '../../decorators/get-refresh-token';
-import { SessionQueryRepository } from '../../session/infrastructure/query-repo/session.query-repository';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { GetAllActiveDevicesQuery } from '../application/queries/get-all-active-devices.query';
 import { DeleteSessionByIdCommand } from '../application/usecases/delete-session-by-id.usecase';
@@ -19,7 +18,6 @@ import { DeleteAllActiveSessionsCommand } from '../application/usecases/delete-a
 @Controller('security')
 export class SecurityController {
   constructor(
-    private sessionRepo: SessionQueryRepository,
     private queryBus: QueryBus,
     private commandBus: CommandBus,
   ) {}

@@ -40,7 +40,7 @@ const refreshTokenConnectionProvider = [
     useFactory: (): JwtService => {
       return new JwtService({
         secret: 'access-token-secret',
-        signOptions: { expiresIn: '10s' },
+        signOptions: { expiresIn: '10m' },
       });
     },
   },
@@ -50,7 +50,7 @@ const refreshTokenConnectionProvider = [
     useFactory: (): JwtService => {
       return new JwtService({
         secret: 'refresh-token-secret',
-        signOptions: { expiresIn: '20s' },
+        signOptions: { expiresIn: '20m' },
       });
     },
   },

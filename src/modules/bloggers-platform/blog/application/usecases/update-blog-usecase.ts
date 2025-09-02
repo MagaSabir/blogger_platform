@@ -12,9 +12,7 @@ export class UpdateBlogCommand {
 }
 
 @CommandHandler(UpdateBlogCommand)
-export class UpdateCommandUseCase
-  implements ICommandHandler<UpdateBlogCommand>
-{
+export class UpdateBlogUseCase implements ICommandHandler<UpdateBlogCommand> {
   constructor(private blogRepo: BlogsRepository) {}
 
   async execute(command: UpdateBlogCommand) {

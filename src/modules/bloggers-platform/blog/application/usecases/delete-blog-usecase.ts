@@ -8,7 +8,7 @@ export class DeleteBlogCommand {
 }
 
 @CommandHandler(DeleteBlogCommand)
-export class DeleteBlogUserCase implements ICommandHandler<DeleteBlogCommand> {
+export class DeleteBlogUseCase implements ICommandHandler<DeleteBlogCommand> {
   constructor(private blogRepo: BlogsRepository) {}
 
   async execute(command: DeleteBlogCommand) {

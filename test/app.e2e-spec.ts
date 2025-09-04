@@ -24,9 +24,9 @@ describe('AppController (e2e)', () => {
       .post('/users')
       .set('Authorization', `Basic ${base64Credentials}`)
       .send({
-        login: 'test3',
-        password: 'test3',
-        email: 'example@example3.com',
+        login: 'user1',
+        password: 'user1',
+        email: 'exampleUser1@example.com',
       })
       .expect(201);
   });

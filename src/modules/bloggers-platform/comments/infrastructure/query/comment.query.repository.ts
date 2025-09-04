@@ -73,7 +73,7 @@ export class CommentQueryRepository {
       commentId: { $in: commentIds },
       userId,
     }).lean();
-
+    //todo create new private method mapToView in this repository and call it here
     const comment = comments.map((el) => {
       const matchedLikes = likes.find((l) => l.commentId === el._id.toString());
       return {

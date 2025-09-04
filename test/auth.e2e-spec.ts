@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { getConnectionToken } from '@nestjs/mongoose';
@@ -31,11 +31,13 @@ describe('AuthController (e2e)', () => {
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
     app.getHttpAdapter().getInstance().set('trust proxy', true);
+    app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
     await app.init();
     for (const collection of Object.keys(connection.collections)) {
       await connection.collections[collection].deleteMany({});
     }
+    // await request(app.getHttpServer()).delete('/testing/all-data');
   });
 
   afterAll(async () => {
@@ -136,22 +138,23 @@ describe('AuthController (e2e)', () => {
     let deviceId: string;
     const loginData = {
       loginOrEmail: 'test2',
-      password: 'test2',
+      password: 'password2',
     };
     it('should create user and login', async () => {
       const basicAuthCredentials = 'admin:qwerty';
       const base64Credentials =
         Buffer.from(basicAuthCredentials).toString('base64');
 
-      await request(app.getHttpServer())
+      const a = await request(app.getHttpServer())
         .post('/users')
         .set('Authorization', `Basic ${base64Credentials}`)
         .send({
           login: 'test2',
-          password: 'test2',
+          password: 'password2',
           email: 'example@example2.com',
         })
         .expect(201);
+      console.log(a.body);
 
       const response = await request(app.getHttpServer())
         .post('/auth/login')
@@ -193,7 +196,7 @@ describe('AuthController (e2e)', () => {
         .set('Authorization', `Basic ${base64Credentials}`)
         .send({
           login: 'test3',
-          password: 'test3',
+          password: 'password3',
           email: 'example@example3.com',
         })
         .expect(201);
@@ -202,7 +205,7 @@ describe('AuthController (e2e)', () => {
         .set('Authorization', `Basic ${base64Credentials}`)
         .send({
           login: 'test4',
-          password: 'test4',
+          password: 'password4',
           email: 'example@example4.com',
         })
         .expect(201);
@@ -210,7 +213,7 @@ describe('AuthController (e2e)', () => {
       const response2 = await request(app.getHttpServer())
         .post('/auth/login')
         .set('User-Agent', 'test')
-        .send({ loginOrEmail: 'test4', password: 'test4' })
+        .send({ loginOrEmail: 'test4', password: 'password4' })
         .expect(200);
       const cookies = response2.headers['set-cookie'];
       token = cookies[0];

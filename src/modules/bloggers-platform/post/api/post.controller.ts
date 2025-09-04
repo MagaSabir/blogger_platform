@@ -108,7 +108,7 @@ export class PostController {
       new GetCommentQuery(commentId, dto.user.userId),
     );
   }
-
+  //TODO create types for outputDto in controller methods
   @Get(':id/comments')
   @UseGuards(JwtOptionalAuthGuard)
   async getCommentsByPostId(
@@ -119,6 +119,7 @@ export class PostController {
     return await this.queryBus.execute<GetAllCommentsByIdQuery, object>(
       new GetAllCommentsByIdQuery(postId, userId, query),
     );
+    //TODO send data as object to other service or repository
   }
 
   @Put(':id/like-status')

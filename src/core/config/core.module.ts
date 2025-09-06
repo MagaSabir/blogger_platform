@@ -5,4 +5,4 @@ import { CoreConfig } from './core.config';
   providers: [CoreConfig],
   exports: [CoreConfig],
 })
-export class ConfigModule {}
+export class CoreModule {}

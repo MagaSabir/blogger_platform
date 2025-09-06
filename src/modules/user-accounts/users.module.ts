@@ -33,6 +33,7 @@ import { SessionRepository } from './session/infrastructure/session-repository';
 import { DeleteAllActiveSessionsUseCase } from './security/application/usecases/delete-all-active-sessions.usecase';
 import { RefreshTokenUseCase } from './users/application/usecases/refresh-token.usecase';
 import { LogoutUseCase } from './users/application/usecases/logout.usecase';
+import { UsersConfig } from './config/users.config';
 
 const refreshTokenConnectionProvider = [
   {
@@ -85,6 +86,7 @@ const queryHandler = [
   ],
   controllers: [UsersController, AuthController, SecurityController],
   providers: [
+    UsersConfig,
     UsersService,
     UsersRepository,
     UsersQueryRepository,

@@ -12,7 +12,7 @@ async function bootstrap() {
   const coreConfig = app.get<CoreConfig>(CoreConfig);
   app.use(cookieParser());
 
-  await app.listen(coreConfig.getPort() ?? 3000);
+  await app.listen(coreConfig.port ?? 3000);
 }
 
 bootstrap();

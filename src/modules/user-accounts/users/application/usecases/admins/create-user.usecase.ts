@@ -9,6 +9,7 @@ import {
 import { UsersRepository } from '../../../infrastructure/users.repository';
 import { BadRequestException } from '@nestjs/common';
 import { BcryptService } from '../../service/bcrypt.service';
+import { UsersConfig } from '../../../../config/users.config';
 
 export class CreateUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -22,6 +23,7 @@ export class CreateUserUseCase
     @InjectModel(User.name) private UserModel: UserModelType,
     private usersRepository: UsersRepository,
     private bcryptService: BcryptService,
+    private usersConfig: UsersConfig,
   ) {}
   async execute({ dto }: CreateUserCommand): Promise<string> {
     const existsUser: UserDocument | null =
@@ -34,6 +36,7 @@ export class CreateUserUseCase
       login: dto.login,
       passwordHash,
       email: dto.email,
+      isEmailConfirmed: this.usersConfig.isAutoConfirmed,
     });
     return await this.usersRepository.save(user);
   }

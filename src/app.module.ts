@@ -12,15 +12,17 @@ import { DomainHttpExceptionsFilter } from './core/exceptions/filters/error-exce
 import { ThrottlerModule } from '@nestjs/throttler';
 import * as process from 'node:process';
 import { CoreConfig } from './core/config/core.config';
-import { ConfigModule } from './core/config/config.module';
+import { CoreModule } from './core/config/core.module';
 
 console.log(process.env.MONGO_URI);
 @Module({
   imports: [
+    CoreModule,
     MongooseModule.forRootAsync({
+      imports: [CoreModule],
       useFactory: (coreConfig: CoreConfig) => {
         return {
-          uri: coreConfig.getUri(),
+          uri: coreConfig.mongo_uri,
         };
       },
       inject: [CoreConfig],
@@ -38,7 +40,6 @@ console.log(process.env.MONGO_URI);
     TestingModule,
     UsersModule,
     NotificationModule,
-    ConfigModule,
   ],
   controllers: [AppController],
   providers: [

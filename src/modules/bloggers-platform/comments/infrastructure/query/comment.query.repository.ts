@@ -9,10 +9,11 @@ import { NotFoundException } from '@nestjs/common';
 import { CommentQueryParams } from '../../api/input-dto/CommentQueryParams';
 import {
   LikeComment,
-  LikeCommentDocument,
   LikeCommentType,
 } from '../../../likes/comments/domain/like-comment.domain';
 import { Post, PostModelType } from '../../../post/domain/post.entity';
+import { BasePaginatedResponse } from '../../../../../core/base-paginated-response';
+import { Likes } from '../../../likes/dto/like.type';
 
 export class CommentQueryRepository {
   constructor(
@@ -26,11 +27,11 @@ export class CommentQueryRepository {
       deletedAt: null,
     });
     if (!comment) throw new NotFoundException();
-    const likes: LikeCommentDocument | null = await this.LikeModel.findOne({
+    const like: Likes | null = await this.LikeModel.findOne({
       commentId,
       userId,
-    });
-    return CommentViewDto.mapToView(comment, likes);
+    }).lean();
+    return CommentViewDto.mapToView(comment, like);
   }
 
   async findCommentOrThrowNotFound(
@@ -50,7 +51,7 @@ export class CommentQueryRepository {
     postId: string,
     userId: string,
     queries: CommentQueryParams,
-  ) {
+  ): Promise<BasePaginatedResponse<CommentViewDto>> {
     // const post = await this.PostModel.findOne({ _id: postId });
     // if (!post) throw new NotFoundException();
     const totalCountPosts: number = await this.CommentModel.countDocuments({
@@ -68,28 +69,17 @@ export class CommentQueryRepository {
       .lean();
 
     if (comments.length === 0) throw new NotFoundException();
-    const commentIds = comments.map((l) => l._id.toString());
+    const commentIds = comments.map((c) => c._id.toString());
     const likes = await this.LikeModel.find({
       commentId: { $in: commentIds },
       userId,
     }).lean();
-    //todo create new private method mapToView in this repository and call it here
-    const comment = comments.map((el) => {
-      const matchedLikes = likes.find((l) => l.commentId === el._id.toString());
-      return {
-        id: el._id.toString(),
-        content: el.content,
-        commentatorInfo: {
-          userId: el.commentatorInfo.userId,
-          userLogin: el.commentatorInfo.userLogin,
-        },
-        createdAt: el.createdAt,
-        likesInfo: {
-          likesCount: el.likesCount,
-          dislikesCount: el.dislikesCount,
-          myStatus: matchedLikes ? matchedLikes.likeStatus : 'None',
-        },
-      };
+
+    const items: CommentViewDto[] = comments.map((comment) => {
+      const userLike: Likes | null =
+        likes.find((like) => like.commentId === comment._id.toString()) ?? null;
+
+      return CommentViewDto.mapToView(comment, userLike);
     });
 
     return {
@@ -97,7 +87,7 @@ export class CommentQueryRepository {
       page: queries.pageNumber,
       pageSize: queries.pageSize,
       totalCount: totalCountPosts,
-      items: comment,
+      items: items,
     };
   }
 }

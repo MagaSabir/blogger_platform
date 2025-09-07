@@ -19,7 +19,7 @@ export class UpdatePostUseCase implements ICommandHandler<UpdatePostCommand> {
     private postRepo: PostsRepository,
   ) {}
 
-  async execute(command: UpdatePostCommand) {
+  async execute(command: UpdatePostCommand): Promise<void> {
     const post: PostDocument | null = await this.postRepo.findPostById(
       command.id,
     );

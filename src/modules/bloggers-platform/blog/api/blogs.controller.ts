@@ -43,14 +43,19 @@ export class BlogsController {
   async getBlogs(
     @Query() query: BlogsQueryParams,
   ): Promise<BasePaginatedResponse<BlogViewDto>> {
-    return this.queryBus.execute(new GetAllBlogsQuery(query));
+    return this.queryBus.execute<
+      GetAllBlogsQuery,
+      BasePaginatedResponse<BlogViewDto>
+    >(new GetAllBlogsQuery(query));
   }
 
   @Get(':id')
   async getBlogById(
     @Param('id', ObjectIdValidationPipe) id: string,
   ): Promise<BlogViewDto> {
-    return await this.queryBus.execute(new GetBlogByIdQuery(id));
+    return await this.queryBus.execute<GetBlogByIdQuery, BlogViewDto>(
+      new GetBlogByIdQuery(id),
+    );
   }
 
   @Post()
@@ -59,7 +64,9 @@ export class BlogsController {
     const id: string = await this.commandBus.execute(
       new CreateBlogCommand(body),
     );
-    return await this.queryBus.execute(new GetBlogByIdQuery(id));
+    return await this.queryBus.execute<GetBlogByIdQuery, BlogViewDto>(
+      new GetBlogByIdQuery(id),
+    );
   }
 
   @Put(':id')
@@ -69,14 +76,18 @@ export class BlogsController {
     @Param('id') id: string,
     @Body() body: UpdateBlogInputDto,
   ): Promise<void> {
-    await this.commandBus.execute(new UpdateBlogCommand(body, id));
+    await this.commandBus.execute<UpdateBlogCommand, void>(
+      new UpdateBlogCommand(body, id),
+    );
   }
 
   @Delete(':id')
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteBlog(@Param('id') id: string): Promise<void> {
-    await this.commandBus.execute(new DeleteBlogCommand(id));
+    await this.commandBus.execute<DeleteBlogCommand, void>(
+      new DeleteBlogCommand(id),
+    );
   }
 
   @Get(':id/posts')

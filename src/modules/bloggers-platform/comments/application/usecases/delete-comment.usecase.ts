@@ -14,7 +14,7 @@ export class DeleteCommentCommand {
 export class DeleteCommentUseCase {
   constructor(private commentRepo: CommentRepository) {}
 
-  async execute(command: DeleteCommentCommand) {
+  async execute(command: DeleteCommentCommand): Promise<void> {
     const comment: CommentDocument =
       await this.commentRepo.findCommentByIdOrThrowNotFound(command.commentId);
     if (comment.commentatorInfo.userId !== command.userId) {

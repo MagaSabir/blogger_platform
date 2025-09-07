@@ -4,6 +4,7 @@ import { QueryPostRepository } from '../../infrastructure/query-repository/query
 import { LikePostRepository } from '../../../likes/posts/infrastructure/like-post.repository';
 import { UsersQueryRepository } from '../../../../user-accounts/users/infrastructure/query-repository/users.query-repository';
 import { PostViewDto } from './view-dto/post.view-dto';
+import { BasePaginatedResponse } from '../../../../../core/base-paginated-response';
 
 export class GetAllPostsQuery {
   constructor(
@@ -22,7 +23,9 @@ export class GetAllPostsQueryHandler
     private userQueryRepo: UsersQueryRepository,
   ) {}
 
-  async execute(query: GetAllPostsQuery) {
+  async execute(
+    query: GetAllPostsQuery,
+  ): Promise<BasePaginatedResponse<PostViewDto>> {
     const { posts, totalCount } = await this.postQueryRepo.getPosts(
       query.queryParam,
       query.userId,

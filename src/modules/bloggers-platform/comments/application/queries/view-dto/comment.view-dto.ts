@@ -1,6 +1,6 @@
 import { CommentDocument } from '../../../domain/comment.domain';
-import { LikeCommentDocument } from '../../../../likes/comments/domain/like-comment.domain';
 import { LikeStatus } from '../../../../likes/dto/like-status.enum';
+import { Likes } from '../../../../likes/dto/like.type';
 
 export class CommentViewDto {
   id: string;
@@ -18,7 +18,7 @@ export class CommentViewDto {
 
   static mapToView(
     comment: CommentDocument,
-    likes: LikeCommentDocument | null,
+    likes: Likes | null,
   ): CommentViewDto {
     const dto = new CommentViewDto();
     dto.id = comment._id.toString();

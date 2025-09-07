@@ -33,6 +33,9 @@ import { CreatePostCommand } from '../application/usecases/create-post-usecase';
 import { CurrentUserId } from '../../../../core/decorators/current-user-id';
 import { DeletePostCommand } from '../application/usecases/delete-post.usecase';
 import { UpdatePostCommand } from '../application/usecases/update-post.usecase';
+import { PostViewDto } from '../application/quries/view-dto/post.view-dto';
+import { BasePaginatedResponse } from '../../../../core/base-paginated-response';
+import { CommentViewDto } from '../../comments/application/queries/view-dto/comment.view-dto';
 
 @Controller('posts')
 export class PostController {
@@ -42,19 +45,22 @@ export class PostController {
   ) {}
   @Post()
   @UseGuards(BasicAuthGuard)
-  async createPost(@Body() dto: CreateInputPostDto) {
+  async createPost(@Body() dto: CreateInputPostDto): Promise<PostViewDto> {
     const postId: string = await this.commandBus.execute(
       new CreatePostCommand(dto),
     );
-    return await this.queryBus.execute<GetPostQuery, object>(
+    return await this.queryBus.execute<GetPostQuery, PostViewDto>(
       new GetPostQuery(postId),
     );
   }
 
   @Get(':id')
   @UseGuards(JwtOptionalAuthGuard)
-  async getPostById(@Param('id') id: string, @CurrentUserId() userId: string) {
-    return await this.queryBus.execute<GetPostQuery, object>(
+  async getPostById(
+    @Param('id') id: string,
+    @CurrentUserId() userId: string,
+  ): Promise<PostViewDto> {
+    return await this.queryBus.execute<GetPostQuery, PostViewDto>(
       new GetPostQuery(id, userId),
     );
   }
@@ -64,24 +70,32 @@ export class PostController {
   async getPosts(
     @Query() query: PostsQueryParams,
     @CurrentUserId() userId: string,
-  ) {
-    return await this.queryBus.execute<GetAllPostsQuery, object>(
-      new GetAllPostsQuery(query, userId),
-    );
+  ): Promise<BasePaginatedResponse<PostViewDto>> {
+    return await this.queryBus.execute<
+      GetAllPostsQuery,
+      BasePaginatedResponse<PostViewDto>
+    >(new GetAllPostsQuery(query, userId));
   }
 
   @Put(':id')
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async updatePost(@Param('id') id: string, @Body() dto: CreateInputPostDto) {
-    await this.commandBus.execute(new UpdatePostCommand(dto, id));
+  async updatePost(
+    @Param('id') id: string,
+    @Body() dto: CreateInputPostDto,
+  ): Promise<void> {
+    await this.commandBus.execute<UpdatePostCommand, void>(
+      new UpdatePostCommand(dto, id),
+    );
   }
 
   @Delete(':id')
   @UseGuards(BasicAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
-  async deletePost(@Param('id') id: string) {
-    await this.commandBus.execute(new DeletePostCommand(id));
+  async deletePost(@Param('id') id: string): Promise<void> {
+    await this.commandBus.execute<DeletePostCommand, void>(
+      new DeletePostCommand(id),
+    );
   }
 
   @Post(':id/comments')
@@ -90,7 +104,7 @@ export class PostController {
     @Body() body: CommentInputDto,
     @Param('id', ObjectIdValidationPipe) postId: string,
     @CurrentUserId() userId: string,
-  ) {
+  ): Promise<CommentViewDto> {
     const user: UserViewDto = await this.queryBus.execute<
       GetUserByIdQuery,
       UserViewDto
@@ -104,7 +118,7 @@ export class PostController {
       CommentCreateCommand,
       string
     >(new CommentCreateCommand(dto));
-    return await this.queryBus.execute<GetCommentQuery, object>(
+    return await this.queryBus.execute<GetCommentQuery, CommentViewDto>(
       new GetCommentQuery(commentId, dto.user.userId),
     );
   }
@@ -115,10 +129,11 @@ export class PostController {
     @Param('id', ObjectIdValidationPipe) postId: string,
     @CurrentUserId() userId: string,
     @Query() query: CommentQueryParams,
-  ) {
-    return await this.queryBus.execute<GetAllCommentsByIdQuery, object>(
-      new GetAllCommentsByIdQuery(postId, userId, query),
-    );
+  ): Promise<BasePaginatedResponse<CommentViewDto>> {
+    return await this.queryBus.execute<
+      GetAllCommentsByIdQuery,
+      BasePaginatedResponse<CommentViewDto>
+    >(new GetAllCommentsByIdQuery(postId, userId, query));
     //TODO send data as object to other service or repository
   }
 
@@ -129,7 +144,7 @@ export class PostController {
     @Body() status: LikeStatusInputDto,
     @Param('id', ObjectIdValidationPipe) id: string,
     @CurrentUserId() userId: string,
-  ) {
+  ): Promise<void> {
     await this.commandBus.execute(
       new LikePostCommand(id, userId, status.likeStatus),
     );

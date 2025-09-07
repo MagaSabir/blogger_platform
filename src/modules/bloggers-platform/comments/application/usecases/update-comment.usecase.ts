@@ -15,7 +15,7 @@ export class UpdateCommentCommand {
 export class UpdateCommentUseCase {
   constructor(private queryRepo: CommentQueryRepository) {}
 
-  async execute(command: UpdateCommentCommand) {
+  async execute(command: UpdateCommentCommand): Promise<void> {
     const comment: CommentDocument =
       await this.queryRepo.findCommentOrThrowNotFound(command.commentId);
 

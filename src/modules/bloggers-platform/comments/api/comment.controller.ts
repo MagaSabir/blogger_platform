@@ -20,6 +20,7 @@ import { DeleteCommentCommand } from '../application/usecases/delete-comment.use
 import { GetCommentQuery } from '../application/queries/get-comment.query';
 import { JwtOptionalAuthGuard } from '../../../user-accounts/users/guards/bearer/Jwt-optional-auth.guard';
 import { SetLikeCommand } from '../application/usecases/set-like.usecase';
+import { CommentViewDto } from '../application/queries/view-dto/comment.view-dto';
 
 @Controller('comments')
 export class CommentController {
@@ -34,8 +35,8 @@ export class CommentController {
     @Body() status: LikeStatusInputDto,
     @Param('id', ObjectIdValidationPipe) id: string,
     @Req() req: { user: { id: string } },
-  ) {
-    await this.commandBus.execute(
+  ): Promise<void> {
+    await this.commandBus.execute<SetLikeCommand, void>(
       new SetLikeCommand(id, req.user.id, status.likeStatus),
     );
   }
@@ -47,8 +48,8 @@ export class CommentController {
     @Body() body: CommentInputDto,
     @Param('id', ObjectIdValidationPipe) id: string,
     @Req() req: { user: { id: string } },
-  ) {
-    await this.commandBus.execute(
+  ): Promise<void> {
+    await this.commandBus.execute<UpdateCommentCommand, void>(
       new UpdateCommentCommand(body.content, id, req.user.id),
     );
   }
@@ -59,7 +60,7 @@ export class CommentController {
   async deleteComment(
     @Param('id', ObjectIdValidationPipe) id: string,
     @Req() req: { user: { id: string } },
-  ) {
+  ): Promise<void> {
     await this.commandBus.execute(new DeleteCommentCommand(id, req.user.id));
   }
 
@@ -68,10 +69,10 @@ export class CommentController {
   async getCommentById(
     @Param('id', ObjectIdValidationPipe) id: string,
     @Req() req: { user: { id: string } },
-  ) {
+  ): Promise<CommentViewDto> {
     const userId = req.user?.id ?? null;
 
-    return this.queryBys.execute<GetCommentQuery, object>(
+    return this.queryBys.execute<GetCommentQuery, CommentViewDto>(
       new GetCommentQuery(id, userId),
     );
   }

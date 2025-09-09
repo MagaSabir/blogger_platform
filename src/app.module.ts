@@ -14,7 +14,6 @@ import * as process from 'node:process';
 import { CoreConfig } from './core/config/core.config';
 import { CoreModule } from './core/config/core.module';
 
-console.log(process.env.MONGO_URI);
 @Module({
   imports: [
     CoreModule,

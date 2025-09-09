@@ -20,6 +20,5 @@ export class UsersConfig {
     this.password = this.configService.get('PASSWORD') || '';
     this.login = this.configService.get('LOGIN') || '';
     ConfigValidation.validationConfig(this);
-    console.log(this.configService);
   }
 }

@@ -34,7 +34,7 @@ export class UsersQueryRepository {
         .lean(),
       this.userModel.countDocuments(filter),
     ]);
-
+    console.log(users);
     const items = users.map((u) => UserViewDto.mapToView(u));
 
     return {
